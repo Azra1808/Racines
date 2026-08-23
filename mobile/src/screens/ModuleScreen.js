@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable, Animated } from 'react-n
 import * as Speech from 'expo-speech';
 import ScreenHeader from '../components/ScreenHeader';
 import { MODULES } from '../data/modules';
+import { marquerModuleTermine, getProgressionModule } from '../data/db';
 
 export default function ModuleScreen({ route, navigation }) {
   const { moduleId } = route.params;
@@ -17,6 +18,9 @@ export default function ModuleScreen({ route, navigation }) {
 
   useEffect(() => {
     Animated.timing(fadeAnim, { toValue: 1, duration: 450, useNativeDriver: true }).start();
+    getProgressionModule(module.id).then((row) => {
+      if (row?.module_termine) setCompleted(true);
+    });
     return () => Speech.stop();
   }, []);
 
@@ -49,6 +53,7 @@ export default function ModuleScreen({ route, navigation }) {
         setIsSpeaking(false);
         Animated.timing(progressAnim, { toValue: 1, duration: 200, useNativeDriver: false }).start();
         setCompleted(true);
+        marquerModuleTermine(module.id);
       },
       onStopped: () => setIsSpeaking(false),
     });

@@ -1,9 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, Animated } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import ScreenHeader from '../components/ScreenHeader';
 import { MODULES, PICTO_EMOJI } from '../data/modules';
+import { getToutesLesProgressions } from '../data/db';
 
-function AnimatedCard({ item, index, onPress }) {
+function AnimatedCard({ item, index, progressions, onPress }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -25,6 +27,11 @@ function AnimatedCard({ item, index, onPress }) {
       >
         <View style={styles.iconWrap}>
           <Text style={styles.icon}>{PICTO_EMOJI[item.pictogrammes[0]] ?? '📘'}</Text>
+          {progressions[item.id]?.module_termine ? (
+            <View style={styles.doneBadge}>
+              <Text style={styles.doneBadgeText}>✓</Text>
+            </View>
+          ) : null}
         </View>
         <View style={styles.cardText}>
           <Text style={styles.cardCategory}>{item.thematique}</Text>
@@ -37,6 +44,14 @@ function AnimatedCard({ item, index, onPress }) {
 }
 
 export default function CatalogScreen({ navigation }) {
+  const [progressions, setProgressions] = useState({});
+
+  useFocusEffect(
+    useCallback(() => {
+      getToutesLesProgressions().then(setProgressions);
+    }, [])
+  );
+
   return (
     <View style={styles.container}>
       <ScreenHeader
@@ -49,7 +64,12 @@ export default function CatalogScreen({ navigation }) {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         renderItem={({ item, index }) => (
-          <AnimatedCard item={item} index={index} onPress={() => navigation.navigate('Module', { moduleId: item.id })} />
+          <AnimatedCard
+            item={item}
+            index={index}
+            progressions={progressions}
+            onPress={() => navigation.navigate('Module', { moduleId: item.id })}
+          />
         )}
       />
     </View>
@@ -67,11 +87,17 @@ const styles = StyleSheet.create({
   },
   iconWrap: {
     width: 48, height: 48, borderRadius: 14, backgroundColor: '#eef3ea',
-    alignItems: 'center', justifyContent: 'center', marginRight: 14,
+    alignItems: 'center', justifyContent: 'center', marginRight: 14, position: 'relative',
   },
   icon: { fontSize: 24 },
   cardText: { flex: 1 },
   cardCategory: { fontSize: 11, fontWeight: '700', color: '#c98a2e', textTransform: 'uppercase', marginBottom: 2 },
   cardTitle: { fontSize: 16, fontWeight: '700', color: '#1c2733' },
   chevron: { fontSize: 22, color: '#c9c0ad', marginLeft: 8 },
+  doneBadge: {
+    position: 'absolute', top: -4, right: -4,
+    width: 20, height: 20, borderRadius: 10,
+    backgroundColor: '#1c6b3f', alignItems: 'center', justifyContent: 'center',
+  },
+  doneBadgeText: { color: '#fff', fontSize: 11, fontWeight: '800' },
 });

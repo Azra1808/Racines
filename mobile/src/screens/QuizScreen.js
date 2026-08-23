@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import ScreenHeader from '../components/ScreenHeader';
 import { MODULES } from '../data/modules';
+import { enregistrerScoreQuiz } from '../data/db';
 
 export default function QuizScreen({ route, navigation }) {
   const { moduleId } = route.params;
@@ -38,6 +39,7 @@ export default function QuizScreen({ route, navigation }) {
       setAnswered(false);
     } else {
       setFinished(true);
+      enregistrerScoreQuiz(module.id, score + (selected === question.correctIndex ? 1 : 0), module.quiz.length);
     }
   }
 
