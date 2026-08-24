@@ -84,6 +84,14 @@ export default function HomeScreen({ navigation }) {
               <Text style={styles.buttonText}>Découvrir les modules</Text>
               <Text style={styles.buttonArrow}>→</Text>
             </Pressable>
+            
+            <Pressable
+              style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
+              onPress={() => navigation.navigate('Lulu')}
+            >
+              <Text style={styles.secondaryButtonText}>💬 Parler à Lulu</Text>
+            </Pressable>
+
           </Animated.View>
 
           <Text style={styles.footer}>Contenus issus du guide officiel UNICEF Cameroun</Text>
@@ -151,4 +159,11 @@ const styles = StyleSheet.create({
     textAlign: 'center', fontSize: 11, color: '#9aa5ad',
     marginTop: 16, marginBottom: 4,
   },
+
+  secondaryButton: {
+  borderWidth: 2, borderColor: '#1c6b3f', paddingVertical: 15,
+  borderRadius: 14, alignItems: 'center', marginTop: 10,
+  },
+  secondaryButtonText: { color: '#1c6b3f', fontSize: 15, fontWeight: '700' },
+
 });
