@@ -5,6 +5,7 @@ import CatalogScreen from '../screens/CatalogScreen';
 import ModuleScreen from '../screens/ModuleScreen';
 import QuizScreen from '../screens/QuizScreen';
 import LuluScreen from '../screens/LuluScreen';
+import AccessibilityScreen from '../screens/AccessibilityScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +18,7 @@ export default function AppNavigator() {
         <Stack.Screen name="Module" component={ModuleScreen} />
         <Stack.Screen name="Quiz" component={QuizScreen} />
         <Stack.Screen name="Lulu" component={LuluScreen} />
+        <Stack.Screen name="Accessibility" component={AccessibilityScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

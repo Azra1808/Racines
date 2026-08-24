@@ -13,7 +13,7 @@ const FEATURES = [
 ];
 
 export default function HomeScreen({ navigation }) {
-  const { colors, isHighContrast, toggleContrast } = useTheme();
+  const { colors } = useTheme();
   const badgeAnim = useRef(new Animated.Value(0)).current;
   const titleAnim = useRef(new Animated.Value(24)).current;
   const titleFade = useRef(new Animated.Value(0)).current;
@@ -41,7 +41,7 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.root}>
       <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.gradientTop} />
-      {!isHighContrast && (
+      {colors.background !== '#000000' && (
         <>
           <View style={styles.circleDecor1} />
           <View style={styles.circleDecor2} />
@@ -51,11 +51,11 @@ export default function HomeScreen({ navigation }) {
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <View style={styles.topBar}>
           <Pressable
-            onPress={toggleContrast}
+            onPress={() => navigation.navigate('Accessibility')}
             style={styles.contrastButton}
-            accessibilityLabel="Basculer le contraste élevé"
+            accessibilityLabel="Ouvrir les réglages d'accessibilité"
           >
-            <Text style={styles.contrastIcon}>{isHighContrast ? '☀️' : '🌓'}</Text>
+            <Text style={styles.contrastIcon}>♿</Text>
           </Pressable>
         </View>
 
