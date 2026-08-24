@@ -3,8 +3,10 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import ScreenHeader from '../components/ScreenHeader';
 import { MODULES } from '../data/modules';
 import { enregistrerScoreQuiz } from '../data/db';
+import { useTheme } from '../context/ThemeContext';
 
 export default function QuizScreen({ route, navigation }) {
+  const { colors } = useTheme();
   const { moduleId } = route.params;
   const module = MODULES.find((m) => m.id === moduleId);
 
@@ -13,6 +15,8 @@ export default function QuizScreen({ route, navigation }) {
   const [answered, setAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+
+  const styles = getStyles(colors);
 
   if (!module || module.quiz.length === 0) {
     return (
@@ -95,19 +99,21 @@ export default function QuizScreen({ route, navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f7f4ee' },
-  empty: { padding: 20, fontSize: 16, color: '#7a8a98' },
-  content: { padding: 20 },
-  question: { fontSize: 20, fontWeight: '800', color: '#1c2733', marginBottom: 20, marginTop: 4 },
-  option: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e8e2d5', borderRadius: 12, padding: 14, marginBottom: 10 },
-  optionCorrect: { borderColor: '#1c6b3f', backgroundColor: '#e5f3ea' },
-  optionWrong: { borderColor: '#c0392b', backgroundColor: '#fbeceb' },
-  optionText: { fontSize: 15, color: '#1c2733' },
-  button: { backgroundColor: '#1c6b3f', paddingVertical: 14, borderRadius: 12, alignItems: 'center', marginTop: 12 },
-  buttonText: { color: '#fff', fontSize: 15, fontWeight: '700' },
-  resultBox: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  resultEmoji: { fontSize: 48, marginBottom: 12 },
-  resultTitle: { fontSize: 24, fontWeight: '800', color: '#1c2733', marginBottom: 8 },
-  resultScore: { fontSize: 18, color: '#33414d', marginBottom: 24 },
-});
+function getStyles(colors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    empty: { padding: 20, fontSize: 16, color: colors.textMuted },
+    content: { padding: 20 },
+    question: { fontSize: 20, fontWeight: '800', color: colors.textPrimary, marginBottom: 20, marginTop: 4 },
+    option: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 12, padding: 14, marginBottom: 10 },
+    optionCorrect: { borderColor: colors.accent, backgroundColor: colors.surfaceAlt },
+    optionWrong: { borderColor: colors.danger, backgroundColor: colors.dangerSoft },
+    optionText: { fontSize: 15, color: colors.textPrimary },
+    button: { backgroundColor: colors.accent, paddingVertical: 14, borderRadius: 12, alignItems: 'center', marginTop: 12 },
+    buttonText: { color: colors.accentText, fontSize: 15, fontWeight: '700' },
+    resultBox: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+    resultEmoji: { fontSize: 48, marginBottom: 12 },
+    resultTitle: { fontSize: 24, fontWeight: '800', color: colors.textPrimary, marginBottom: 8 },
+    resultScore: { fontSize: 18, color: colors.textSecondary, marginBottom: 24 },
+  });
+}

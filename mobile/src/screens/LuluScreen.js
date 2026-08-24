@@ -5,6 +5,7 @@ import {
 import ScreenHeader from '../components/ScreenHeader';
 import { MODULES } from '../data/modules';
 import { trouverReponse, LULU_FALLBACK } from '../data/luluResponses';
+import { useTheme } from '../context/ThemeContext';
 
 const MESSAGE_ACCUEIL = {
   id: 'accueil',
@@ -13,9 +14,12 @@ const MESSAGE_ACCUEIL = {
 };
 
 export default function LuluScreen({ navigation }) {
+  const { colors } = useTheme();
   const [messages, setMessages] = useState([MESSAGE_ACCUEIL]);
   const [saisie, setSaisie] = useState('');
   const listRef = useRef(null);
+
+  const styles = getStyles(colors);
 
   function envoyerMessage() {
     const texte = saisie.trim();
@@ -75,7 +79,7 @@ export default function LuluScreen({ navigation }) {
           <TextInput
             style={styles.input}
             placeholder="Écrivez votre question…"
-            placeholderTextColor="#9aa5ad"
+            placeholderTextColor={colors.textMuted}
             value={saisie}
             onChangeText={setSaisie}
             onSubmitEditing={envoyerMessage}
@@ -90,32 +94,35 @@ export default function LuluScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f7f4ee' },
-  list: { padding: 16, gap: 10 },
-  bubbleRow: { flexDirection: 'row', marginBottom: 4 },
-  bubbleRowRight: { justifyContent: 'flex-end' },
-  bubble: { maxWidth: '82%', borderRadius: 16, padding: 12 },
-  bubbleLulu: { backgroundColor: '#fff', borderTopLeftRadius: 4 },
-  bubbleUser: { backgroundColor: '#1c6b3f', borderTopRightRadius: 4 },
-  bubbleTextLulu: { color: '#1c2733', fontSize: 15, lineHeight: 21 },
-  bubbleTextUser: { color: '#fff', fontSize: 15, lineHeight: 21 },
-  suggestionCard: {
-    marginTop: 10, backgroundColor: '#eef3ea', borderRadius: 10, padding: 10,
-  },
-  suggestionTitle: { fontSize: 13, fontWeight: '700', color: '#1c2733', marginBottom: 4 },
-  suggestionArrow: { fontSize: 12, color: '#1c6b3f', fontWeight: '600' },
-  inputRow: {
-    flexDirection: 'row', alignItems: 'center', padding: 12, gap: 8,
-    borderTopWidth: 1, borderTopColor: '#e8e2d5', backgroundColor: '#f7f4ee',
-  },
-  input: {
-    flex: 1, backgroundColor: '#fff', borderRadius: 20, paddingHorizontal: 16,
-    paddingVertical: 10, fontSize: 15, borderWidth: 1, borderColor: '#e8e2d5',
-  },
-  sendButton: {
-    width: 42, height: 42, borderRadius: 21, backgroundColor: '#1c6b3f',
-    alignItems: 'center', justifyContent: 'center',
-  },
-  sendButtonText: { color: '#fff', fontSize: 18 },
-});
+function getStyles(colors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    list: { padding: 16, gap: 10 },
+    bubbleRow: { flexDirection: 'row', marginBottom: 4 },
+    bubbleRowRight: { justifyContent: 'flex-end' },
+    bubble: { maxWidth: '82%', borderRadius: 16, padding: 12 },
+    bubbleLulu: {
+      backgroundColor: colors.surface, borderTopLeftRadius: 4,
+      borderWidth: colors.background === '#000000' ? 1 : 0, borderColor: colors.border,
+    },
+    bubbleUser: { backgroundColor: colors.accent, borderTopRightRadius: 4 },
+    bubbleTextLulu: { color: colors.textPrimary, fontSize: 15, lineHeight: 21 },
+    bubbleTextUser: { color: colors.accentText, fontSize: 15, lineHeight: 21 },
+    suggestionCard: { marginTop: 10, backgroundColor: colors.surfaceAlt, borderRadius: 10, padding: 10 },
+    suggestionTitle: { fontSize: 13, fontWeight: '700', color: colors.textPrimary, marginBottom: 4 },
+    suggestionArrow: { fontSize: 12, color: colors.accent, fontWeight: '600' },
+    inputRow: {
+      flexDirection: 'row', alignItems: 'center', padding: 12, gap: 8,
+      borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.background,
+    },
+    input: {
+      flex: 1, backgroundColor: colors.surface, borderRadius: 20, paddingHorizontal: 16,
+      paddingVertical: 10, fontSize: 15, borderWidth: 1, borderColor: colors.border, color: colors.textPrimary,
+    },
+    sendButton: {
+      width: 42, height: 42, borderRadius: 21, backgroundColor: colors.accent,
+      alignItems: 'center', justifyContent: 'center',
+    },
+    sendButtonText: { color: colors.accentText, fontSize: 18 },
+  });
+}

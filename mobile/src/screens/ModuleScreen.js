@@ -4,8 +4,10 @@ import * as Speech from 'expo-speech';
 import ScreenHeader from '../components/ScreenHeader';
 import { MODULES } from '../data/modules';
 import { marquerModuleTermine, getProgressionModule } from '../data/db';
+import { useTheme } from '../context/ThemeContext';
 
 export default function ModuleScreen({ route, navigation }) {
+  const { colors } = useTheme();
   const { moduleId } = route.params;
   const module = MODULES.find((m) => m.id === moduleId);
 
@@ -18,9 +20,11 @@ export default function ModuleScreen({ route, navigation }) {
 
   useEffect(() => {
     Animated.timing(fadeAnim, { toValue: 1, duration: 450, useNativeDriver: true }).start();
-    getProgressionModule(module.id).then((row) => {
-      if (row?.module_termine) setCompleted(true);
-    });
+    if (module) {
+      getProgressionModule(module.id).then((row) => {
+        if (row?.module_termine) setCompleted(true);
+      });
+    }
     return () => Speech.stop();
   }, []);
 
@@ -58,6 +62,8 @@ export default function ModuleScreen({ route, navigation }) {
       onStopped: () => setIsSpeaking(false),
     });
   }
+
+  const styles = getStyles(colors);
 
   if (!module) {
     return (
@@ -103,17 +109,23 @@ export default function ModuleScreen({ route, navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f7f4ee' },
-  content: { padding: 20 },
-  source: { fontSize: 12, color: '#7a8a98', marginBottom: 16, fontStyle: 'italic' },
-  progressTrack: { height: 6, backgroundColor: '#e8e2d5', borderRadius: 3, marginBottom: 16, overflow: 'hidden' },
-  progressFill: { height: '100%', backgroundColor: '#1c6b3f' },
-  playButton: { backgroundColor: '#1c6b3f', paddingVertical: 14, borderRadius: 10, alignItems: 'center', marginBottom: 20 },
-  playButtonText: { color: '#fff', fontSize: 15, fontWeight: '700' },
-  body: { fontSize: 16, lineHeight: 25, color: '#33414d' },
-  completedBadge: { marginTop: 20, backgroundColor: '#e5f3ea', padding: 12, borderRadius: 8, alignItems: 'center' },
-  completedText: { color: '#1c6b3f', fontWeight: '700' },
-  quizButton: { marginTop: 16, borderWidth: 2, borderColor: '#1c6b3f', borderRadius: 10, paddingVertical: 14, alignItems: 'center' },
-  quizButtonText: { color: '#1c6b3f', fontSize: 15, fontWeight: '700' },
-});
+function getStyles(colors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    content: { padding: 20 },
+    source: { fontSize: 12, color: colors.textMuted, marginBottom: 16, fontStyle: 'italic' },
+    progressTrack: { height: 6, backgroundColor: colors.border, borderRadius: 3, marginBottom: 16, overflow: 'hidden' },
+    progressFill: { height: '100%', backgroundColor: colors.accent },
+    playButton: { backgroundColor: colors.accent, paddingVertical: 14, borderRadius: 10, alignItems: 'center', marginBottom: 20 },
+    playButtonText: { color: colors.accentText, fontSize: 15, fontWeight: '700' },
+    body: { fontSize: 16, lineHeight: 25, color: colors.textPrimary },
+    completedBadge: {
+      marginTop: 20, backgroundColor: colors.surfaceAlt, padding: 12,
+      borderRadius: 8, alignItems: 'center',
+      borderWidth: colors.background === '#000000' ? 1 : 0, borderColor: colors.accent,
+    },
+    completedText: { color: colors.accent, fontWeight: '700' },
+    quizButton: { marginTop: 16, borderWidth: 2, borderColor: colors.accent, borderRadius: 10, paddingVertical: 14, alignItems: 'center' },
+    quizButtonText: { color: colors.accent, fontSize: 15, fontWeight: '700' },
+  });
+}
