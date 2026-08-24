@@ -1,6 +1,17 @@
-// ⚠️ RÉPONSES PLACEHOLDER — logique par mots-clés simple, en attendant
-// un vrai moteur conversationnel (périmètre E3). Ne pas présenter comme
-// une IA générative devant le jury sans clarifier son fonctionnement réel.
+// Lulu est un routeur documentaire local, pas un diagnostic médical ni une IA générative.
+// Les réponses orientent uniquement vers les modules validés du corpus embarqué.
+
+const SIGNAUX_URGENCE = [
+  'ne respire', 'respire plus', 'perdu connaissance', 'saigne beaucoup',
+  'viol', 'abus', 'maltraitance', 'battu', 'frappé', 'danger immédiat',
+  'se faire mal', 'suicide', 'tuer',
+];
+
+const REPONSE_URGENCE = {
+  type: 'urgence',
+  reponse:
+    "La sécurité de l’enfant passe avant l’application. Si l’enfant risque une violence, ne respire pas, saigne beaucoup ou a perdu connaissance, cherchez immédiatement l’aide d’un adulte de confiance et du centre de santé ou service d’urgence le plus proche. Lulu ne peut pas gérer une urgence.",
+};
 
 export const LULU_RULES = [
   {
@@ -46,10 +57,14 @@ export const LULU_RULES = [
 ];
 
 export const LULU_FALLBACK =
-  'Je ne suis pas encore capable de répondre précisément à ça, mais vous trouverez sûrement une réponse dans nos 8 modules — voulez-vous y jeter un œil ?';
+  "Je n’ai pas de réponse fiable à cette question dans les modules validés. Consultez le catalogue ou parlez-en à un facilitateur communautaire ou un professionnel compétent.";
 
 export function trouverReponse(texte) {
-  const texteNormalise = texte.toLowerCase();
+  const texteNormalise = texte.trim().toLowerCase();
+  if (SIGNAUX_URGENCE.some((signal) => texteNormalise.includes(signal))) {
+    return REPONSE_URGENCE;
+  }
+
   for (const regle of LULU_RULES) {
     if (regle.keywords.some((k) => texteNormalise.includes(k))) {
       return regle;

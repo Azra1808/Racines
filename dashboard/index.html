@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Tableau de bord facilitateur RACINES — environnement de démonstration local." />
+    <title>RACINES · Poste facilitateur</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+    <header class="site-header">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">R</span><span>RACINES</span></div>
+      <div class="header-meta">
+        <span class="eyebrow">Poste facilitateur</span>
+        <span class="demo-badge">Données de démonstration</span>
+      </div>
+    </header>
+
+    <main id="contenu" class="shell">
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">Suivi communautaire · aperçu local</p>
+          <h1 id="page-title">Voir qui avance.<br />Agir quand il le faut.</h1>
+          <p class="lede">Ce poste de démonstration donne aux facilitateurs une lecture simple : accès, apprentissage et signaux à traiter — sans données personnelles.</p>
+        </div>
+        <aside class="integrity-note" aria-label="Statut des données">
+          <span class="note-dot" aria-hidden="true"></span>
+          <div><strong>Mode démonstration</strong><br /><span>Jeu de données synthétique · aucune décision terrain à prendre depuis cet écran.</span></div>
+        </aside>
+      </section>
+
+      <section class="storyline" aria-label="Lecture rapide du jour">
+        <div class="story-step active"><span>01</span><strong>Atteindre</strong><small>Par canal</small></div>
+        <div class="story-line" aria-hidden="true"></div>
+        <div class="story-step"><span>02</span><strong>Apprendre</strong><small>Par module</small></div>
+        <div class="story-line" aria-hidden="true"></div>
+        <div class="story-step"><span>03</span><strong>Protéger</strong><small>Signaux suivis</small></div>
+      </section>
+
+      <section class="metrics" aria-label="Indicateurs clés de démonstration">
+        <article class="metric"><p>Parents engagés</p><strong id="parents-count">128</strong><span>sur les 30 derniers jours</span></article>
+        <article class="metric"><p>Modules terminés</p><strong id="modules-count">74</strong><span>progressions validées</span></article>
+        <article class="metric"><p>Accès sans données mobiles</p><strong id="offline-count">61%</strong><span>appareil ou canal low-tech</span></article>
+        <article class="metric alert"><p>Signaux à suivre</p><strong id="alerts-count">3</strong><span>requièrent un contact humain</span></article>
+      </section>
+
+      <section class="work-grid" aria-label="Suivi par canal et priorités">
+        <article class="panel reach-panel">
+          <div class="panel-heading"><div><p class="eyebrow">Portes d’entrée</p><h2>Un contenu, plusieurs chemins</h2></div><span>30 jours</span></div>
+          <div class="channels" role="list">
+            <div class="channel" role="listitem"><span class="channel-label"><i class="channel-dot app" aria-hidden="true"></i>Application Android</span><strong>56</strong><div class="bar"><span style="--size: 72%"></span></div></div>
+            <div class="channel" role="listitem"><span class="channel-label"><i class="channel-dot ussd" aria-hidden="true"></i>USSD simulé</span><strong>38</strong><div class="bar"><span style="--size: 49%"></span></div></div>
+            <div class="channel" role="listitem"><span class="channel-label"><i class="channel-dot ivr" aria-hidden="true"></i>Messages vocaux</span><strong>21</strong><div class="bar"><span style="--size: 27%"></span></div></div>
+            <div class="channel" role="listitem"><span class="channel-label"><i class="channel-dot sms" aria-hidden="true"></i>SMS</span><strong>13</strong><div class="bar"><span style="--size: 17%"></span></div></div>
+          </div>
+          <p class="caption">Les chiffres illustrent la structure attendue ; ils ne représentent pas des parents réellement touchés.</p>
+        </article>
+
+        <article class="panel learning-panel">
+          <div class="panel-heading"><div><p class="eyebrow">Apprentissage</p><h2>Où l’accompagnement est le plus utile</h2></div><button class="text-button" type="button" data-action="refresh">Actualiser la démo</button></div>
+          <ol class="module-list">
+            <li><span>Discipliner sans punir</span><strong>18</strong><small>progressions</small></li>
+            <li><span>Les 1 000 premiers jours</span><strong>16</strong><small>progressions</small></li>
+            <li><span>Parler à son enfant</span><strong>14</strong><small>progressions</small></li>
+            <li><span>Voir son enfant autrement</span><strong>11</strong><small>progressions</small></li>
+          </ol>
+          <div class="sync-line"><span class="sync-pulse" aria-hidden="true"></span><span id="sync-status">Dernière mise à jour : démo locale</span></div>
+        </article>
+      </section>
+
+      <section class="signal-section" aria-labelledby="signals-title">
+        <div class="section-heading"><div><p class="eyebrow">File de vigilance</p><h2 id="signals-title">Un signal ouvre une conversation humaine, jamais une décision automatisée.</h2></div><button type="button" class="primary-button" data-action="create">Simuler un signal</button></div>
+        <div class="table-wrap" tabindex="0">
+          <table>
+            <thead><tr><th>Signal</th><th>Canal</th><th>État</th><th>Action facilitateur</th><th><span class="sr-only">Action</span></th></tr></thead>
+            <tbody id="signal-body">
+              <tr><td>Besoin d’orientation locale</td><td>Application</td><td><span class="status open">À contacter</span></td><td>Proposer un échange confidentiel</td><td><button class="resolve" type="button">Marquer suivi</button></td></tr>
+              <tr><td>Question hors corpus</td><td>USSD simulé</td><td><span class="status waiting">À orienter</span></td><td>Rappeler le rôle du facilitateur</td><td><button class="resolve" type="button">Marquer suivi</button></td></tr>
+              <tr><td>Demande de lecture vocale</td><td>IVR</td><td><span class="status waiting">À vérifier</span></td><td>Vérifier l’accès au message</td><td><button class="resolve" type="button">Marquer suivi</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="proof-strip" aria-labelledby="proof-title">
+        <div><p class="eyebrow">Preuves avant promesses</p><h2 id="proof-title">À filmer et à vérifier sur appareil réel</h2></div>
+        <ul>
+          <li>Application démarrée hors connexion</li>
+          <li>Lecture vocale et contraste élevé activés</li>
+          <li>Événement de suivi visible après actualisation</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer><span>RACINES · environnement local de démonstration</span><span>Ne contient aucune donnée personnelle.</span></footer>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>

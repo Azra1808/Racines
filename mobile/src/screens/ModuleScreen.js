@@ -13,6 +13,7 @@ export default function ModuleScreen({ route, navigation }) {
 
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [speechProgress, setSpeechProgress] = useState(0);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const progressAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -43,23 +44,28 @@ export default function ModuleScreen({ route, navigation }) {
     }
   }, [isSpeaking]);
 
-  function handlePlay() {
-    if (isSpeaking) { Speech.stop(); setIsSpeaking(false); return; }
+  async function handlePlay() {
+    if (isSpeaking) { await Speech.stop(); setIsSpeaking(false); return; }
+    await Speech.stop();
     progressAnim.setValue(0);
+    setSpeechProgress(0);
     setIsSpeaking(true);
     Speech.speak(module.corpsApp, {
       language: 'fr-FR',
       onBoundary: (event) => {
         const pct = Math.min(1, event.charIndex / module.corpsApp.length);
+        setSpeechProgress(Math.round(pct * 100));
         Animated.timing(progressAnim, { toValue: pct, duration: 150, useNativeDriver: false }).start();
       },
       onDone: () => {
         setIsSpeaking(false);
+        setSpeechProgress(100);
         Animated.timing(progressAnim, { toValue: 1, duration: 200, useNativeDriver: false }).start();
         setCompleted(true);
         marquerModuleTermine(module.id);
       },
       onStopped: () => setIsSpeaking(false),
+      onError: () => setIsSpeaking(false),
     });
   }
 
@@ -81,12 +87,23 @@ export default function ModuleScreen({ route, navigation }) {
       <Animated.ScrollView contentContainerStyle={[styles.content, { opacity: fadeAnim }]}>
         <Text style={styles.source}>Source : {module.moduleOrigine}</Text>
 
-        <View style={styles.progressTrack}>
+        <View
+          style={styles.progressTrack}
+          accessibilityRole="progressbar"
+          accessibilityLabel="Progression de la lecture audio"
+          accessibilityValue={{ min: 0, max: 100, now: speechProgress }}
+        >
           <Animated.View style={[styles.progressFill, { width: progressWidth }]} />
         </View>
 
         <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-          <Pressable style={styles.playButton} onPress={handlePlay}>
+          <Pressable
+            style={styles.playButton}
+            onPress={handlePlay}
+            accessibilityRole="button"
+            accessibilityLabel={isSpeaking ? 'Arrêter la lecture audio' : 'Écouter le module'}
+            accessibilityHint="La lecture dépend de la voix française disponible sur le téléphone."
+          >
             <Text style={styles.playButtonText}>{isSpeaking ? '⏸ Arrêter la lecture' : '▶ Écouter le module'}</Text>
           </Pressable>
         </Animated.View>
@@ -100,7 +117,12 @@ export default function ModuleScreen({ route, navigation }) {
         )}
 
         {module.quiz.length > 0 && (
-          <Pressable style={styles.quizButton} onPress={() => navigation.navigate('Quiz', { moduleId: module.id })}>
+          <Pressable
+            style={styles.quizButton}
+            onPress={() => navigation.navigate('Quiz', { moduleId: module.id })}
+            accessibilityRole="button"
+            accessibilityLabel={`Tester mes connaissances sur ${module.titre}`}
+          >
             <Text style={styles.quizButtonText}>📝 Tester mes connaissances</Text>
           </Pressable>
         )}

@@ -11,7 +11,14 @@ export default function ScreenHeader({ title, subtitle, onBack }) {
       <SafeAreaView edges={['top']}>
         <View style={styles.row}>
           {onBack && (
-            <Pressable onPress={onBack} style={[styles.iconButton, { backgroundColor: 'rgba(255,255,255,0.15)' }]} hitSlop={12}>
+            <Pressable
+              onPress={onBack}
+              style={[styles.iconButton, { backgroundColor: 'rgba(255,255,255,0.15)' }]}
+              hitSlop={12}
+              accessibilityRole="button"
+              accessibilityLabel="Revenir à l'écran précédent"
+              accessibilityHint="Retourne à l'écran précédent."
+            >
               <Text style={[styles.backIcon, { color: colors.accentText === '#000000' ? '#000' : '#fff' }]}>←</Text>
             </Pressable>
           )}
@@ -27,7 +34,9 @@ export default function ScreenHeader({ title, subtitle, onBack }) {
             onPress={toggleContrast}
             style={[styles.iconButton, { backgroundColor: 'rgba(255,255,255,0.15)' }]}
             hitSlop={12}
+            accessibilityRole="button"
             accessibilityLabel="Basculer le contraste élevé"
+            accessibilityHint={isHighContrast ? 'Désactive le contraste élevé.' : 'Active le contraste élevé.'}
           >
             <Text style={styles.contrastIcon}>{isHighContrast ? '☀️' : '🌓'}</Text>
           </Pressable>

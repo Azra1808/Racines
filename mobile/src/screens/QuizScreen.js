@@ -33,17 +33,20 @@ export default function QuizScreen({ route, navigation }) {
     if (answered) return;
     setSelected(index);
     setAnswered(true);
-    if (index === question.correctIndex) setScore((s) => s + 1);
   }
 
   function handleNext() {
+    const scoreApresReponse = score + (selected === question.correctIndex ? 1 : 0);
+
     if (currentIndex + 1 < module.quiz.length) {
+      setScore(scoreApresReponse);
       setCurrentIndex((i) => i + 1);
       setSelected(null);
       setAnswered(false);
     } else {
+      setScore(scoreApresReponse);
       setFinished(true);
-      enregistrerScoreQuiz(module.id, score + (selected === question.correctIndex ? 1 : 0), module.quiz.length);
+      enregistrerScoreQuiz(module.id, scoreApresReponse, module.quiz.length);
     }
   }
 
@@ -71,7 +74,7 @@ export default function QuizScreen({ route, navigation }) {
         onBack={() => navigation.goBack()}
       />
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.question}>{question.question}</Text>
+        <Text style={styles.question} accessibilityRole="header">{question.question}</Text>
 
         {question.options.map((option, index) => {
           const isCorrect = index === question.correctIndex;
@@ -81,14 +84,35 @@ export default function QuizScreen({ route, navigation }) {
           else if (answered && isSelected && !isCorrect) optionStyle.push(styles.optionWrong);
 
           return (
-            <Pressable key={index} style={optionStyle} onPress={() => handleSelect(index)}>
+            <Pressable
+              key={index}
+              style={optionStyle}
+              onPress={() => handleSelect(index)}
+              accessibilityRole="radio"
+              accessibilityLabel={`Réponse ${index + 1} : ${option}`}
+              accessibilityHint={answered ? 'La réponse a déjà été validée.' : 'Double-tapez pour choisir cette réponse.'}
+              accessibilityState={{ selected: isSelected, disabled: answered }}
+            >
               <Text style={styles.optionText}>{option}</Text>
             </Pressable>
           );
         })}
 
         {answered && (
-          <Pressable style={styles.button} onPress={handleNext}>
+          <View accessibilityLiveRegion="polite">
+            <Text style={selected === question.correctIndex ? styles.feedbackCorrect : styles.feedbackWrong}>
+              {selected === question.correctIndex ? 'Bonne réponse.' : 'Réponse enregistrée. La bonne réponse est indiquée en vert.'}
+            </Text>
+          </View>
+        )}
+
+        {answered && (
+          <Pressable
+            style={styles.button}
+            onPress={handleNext}
+            accessibilityRole="button"
+            accessibilityLabel={currentIndex + 1 < module.quiz.length ? 'Passer à la question suivante' : 'Afficher le résultat du quiz'}
+          >
             <Text style={styles.buttonText}>
               {currentIndex + 1 < module.quiz.length ? 'Question suivante' : 'Voir le résultat'}
             </Text>
@@ -109,6 +133,8 @@ function getStyles(colors) {
     optionCorrect: { borderColor: colors.accent, backgroundColor: colors.surfaceAlt },
     optionWrong: { borderColor: colors.danger, backgroundColor: colors.dangerSoft },
     optionText: { fontSize: 15, color: colors.textPrimary },
+    feedbackCorrect: { color: colors.accent, fontSize: 15, fontWeight: '700', marginTop: 6 },
+    feedbackWrong: { color: colors.danger, fontSize: 15, fontWeight: '700', marginTop: 6 },
     button: { backgroundColor: colors.accent, paddingVertical: 14, borderRadius: 12, alignItems: 'center', marginTop: 12 },
     buttonText: { color: colors.accentText, fontSize: 15, fontWeight: '700' },
     resultBox: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },

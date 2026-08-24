@@ -33,7 +33,8 @@ export default function LuluScreen({ navigation }) {
       id: `l-${Date.now()}`,
       auteur: 'lulu',
       texte: regle ? regle.reponse : LULU_FALLBACK,
-      moduleSuggere: module,
+      moduleSuggere: regle?.type === 'urgence' ? null : module,
+      estUrgent: regle?.type === 'urgence',
     };
 
     setMessages((prev) => [...prev, messageUtilisateur, messageLulu]);
@@ -57,7 +58,10 @@ export default function LuluScreen({ navigation }) {
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
             <View style={[styles.bubbleRow, item.auteur === 'utilisateur' && styles.bubbleRowRight]}>
-              <View style={[styles.bubble, item.auteur === 'utilisateur' ? styles.bubbleUser : styles.bubbleLulu]}>
+              <View
+                style={[styles.bubble, item.auteur === 'utilisateur' ? styles.bubbleUser : styles.bubbleLulu, item.estUrgent && styles.bubbleUrgent]}
+                accessibilityLiveRegion={item.auteur === 'lulu' ? (item.estUrgent ? 'assertive' : 'polite') : 'none'}
+              >
                 <Text style={item.auteur === 'utilisateur' ? styles.bubbleTextUser : styles.bubbleTextLulu}>
                   {item.texte}
                 </Text>
@@ -65,8 +69,11 @@ export default function LuluScreen({ navigation }) {
                   <Pressable
                     style={styles.suggestionCard}
                     onPress={() => navigation.navigate('Module', { moduleId: item.moduleSuggere.id })}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Ouvrir le module ${item.moduleSuggere.titre}`}
                   >
                     <Text style={styles.suggestionTitle}>{item.moduleSuggere.titre}</Text>
+                    <Text style={styles.suggestionSource}>Source : {item.moduleSuggere.moduleOrigine}</Text>
                     <Text style={styles.suggestionArrow}>Ouvrir le module →</Text>
                   </Pressable>
                 )}
@@ -84,8 +91,16 @@ export default function LuluScreen({ navigation }) {
             onChangeText={setSaisie}
             onSubmitEditing={envoyerMessage}
             returnKeyType="send"
+            accessibilityLabel="Votre question à Lulu"
+            accessibilityHint="Écrivez une question sur votre enfant puis envoyez-la."
           />
-          <Pressable style={styles.sendButton} onPress={envoyerMessage}>
+          <Pressable
+            style={styles.sendButton}
+            onPress={envoyerMessage}
+            accessibilityRole="button"
+            accessibilityLabel="Envoyer la question à Lulu"
+            accessibilityHint="Lulu vous orientera vers un module approprié ou vers une aide urgente si nécessaire."
+          >
             <Text style={styles.sendButtonText}>➤</Text>
           </Pressable>
         </View>
@@ -106,10 +121,12 @@ function getStyles(colors) {
       borderWidth: colors.background === '#000000' ? 1 : 0, borderColor: colors.border,
     },
     bubbleUser: { backgroundColor: colors.accent, borderTopRightRadius: 4 },
+    bubbleUrgent: { backgroundColor: colors.dangerSoft, borderWidth: 2, borderColor: colors.danger },
     bubbleTextLulu: { color: colors.textPrimary, fontSize: 15, lineHeight: 21 },
     bubbleTextUser: { color: colors.accentText, fontSize: 15, lineHeight: 21 },
     suggestionCard: { marginTop: 10, backgroundColor: colors.surfaceAlt, borderRadius: 10, padding: 10 },
     suggestionTitle: { fontSize: 13, fontWeight: '700', color: colors.textPrimary, marginBottom: 4 },
+    suggestionSource: { fontSize: 11, color: colors.textSecondary, marginBottom: 4 },
     suggestionArrow: { fontSize: 12, color: colors.accent, fontWeight: '600' },
     inputRow: {
       flexDirection: 'row', alignItems: 'center', padding: 12, gap: 8,
