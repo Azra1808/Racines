@@ -4,8 +4,9 @@ import { useFocusEffect } from '@react-navigation/native';
 import ScreenHeader from '../components/ScreenHeader';
 import { MODULES, PICTO_EMOJI } from '../data/modules';
 import { getToutesLesProgressions } from '../data/db';
+import { useTheme } from '../context/ThemeContext';
 
-function AnimatedCard({ item, index, progressions, onPress }) {
+function AnimatedCard({ item, index, progressions, colors, onPress }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -20,7 +21,7 @@ function AnimatedCard({ item, index, progressions, onPress }) {
   return (
     <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }, { scale: scaleAnim }] }}>
       <Pressable
-        style={styles.card}
+        style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: colors.background === '#000000' ? 1 : 0 }]}
         onPress={onPress}
         onPressIn={() => Animated.spring(scaleAnim, { toValue: 0.96, useNativeDriver: true }).start()}
         onPressOut={() => Animated.spring(scaleAnim, { toValue: 1, friction: 4, useNativeDriver: true }).start()}
@@ -45,6 +46,7 @@ function AnimatedCard({ item, index, progressions, onPress }) {
 
 export default function CatalogScreen({ navigation }) {
   const [progressions, setProgressions] = useState({});
+  const { colors } = useTheme();
 
   useFocusEffect(
     useCallback(() => {
@@ -53,7 +55,7 @@ export default function CatalogScreen({ navigation }) {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScreenHeader
         title="Les modules"
         subtitle={`${MODULES.length} thématiques du programme officiel`}
@@ -68,6 +70,7 @@ export default function CatalogScreen({ navigation }) {
             item={item}
             index={index}
             progressions={progressions}
+            colors={colors}
             onPress={() => navigation.navigate('Module', { moduleId: item.id })}
           />
         )}
