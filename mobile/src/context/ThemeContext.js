@@ -43,6 +43,7 @@ const ThemeContext = createContext(null);
 export function ThemeProvider({ children }) {
   const [isHighContrast, setIsHighContrast] = useState(false);
   const [fontScale, setFontScale] = useState(1);
+  const [isSimplifiedMode, setIsSimplifiedMode] = useState(false);
 
   const value = useMemo(() => {
     function increaseFontScale() {
@@ -69,8 +70,10 @@ export function ThemeProvider({ children }) {
       decreaseFontScale,
       resetFontScale,
       rf,
+      isSimplifiedMode,
+      toggleSimplifiedMode: () => setIsSimplifiedMode((v) => !v),
     };
-  }, [isHighContrast, fontScale]);
+  }, [isHighContrast, fontScale, isSimplifiedMode]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
