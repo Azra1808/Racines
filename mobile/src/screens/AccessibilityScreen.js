@@ -6,7 +6,7 @@ export default function AccessibilityScreen({ navigation }) {
   const {
     colors, isHighContrast, toggleContrast,
     fontScale, fontScaleMin, fontScaleMax,
-    increaseFontScale, decreaseFontScale, resetFontScale, rf,
+    increaseFontScale, decreaseFontScale, resetFontScale, rf,isSimplifiedMode, toggleSimplifiedMode,
   } = useTheme();
 
   const styles = getStyles(colors);
@@ -71,6 +71,22 @@ export default function AccessibilityScreen({ navigation }) {
               <Text style={[styles.resetButtonText, { fontSize: rf(13) }]}>Réinitialiser la taille</Text>
             </Pressable>
           )}
+        </View>
+
+        <View style={styles.card}>
+          <Text style={[styles.cardTitle, { fontSize: rf(16) }]}>Mode lecture simplifiée</Text>
+          <Text style={[styles.cardDescription, { fontSize: rf(14) }]}>
+            Affiche les modules en phrases courtes avec de grands pictogrammes,
+            plus facile à suivre.
+          </Text>
+          <Pressable
+            style={[styles.toggleRow, { backgroundColor: isSimplifiedMode ? colors.accent : colors.surfaceAlt }]}
+            onPress={toggleSimplifiedMode}
+          >
+            <Text style={[styles.toggleText, { color: isSimplifiedMode ? colors.accentText : colors.textPrimary, fontSize: rf(15) }]}>
+              {isSimplifiedMode ? '✓  Mode simplifié activé' : '🖼️  Activer le mode simplifié'}
+              </Text>
+          </Pressable>
         </View>
 
       </ScrollView>

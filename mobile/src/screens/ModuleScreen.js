@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Animated } from 'react-native';
 import * as Speech from 'expo-speech';
 import ScreenHeader from '../components/ScreenHeader';
-import { MODULES } from '../data/modules';
+import { MODULES, PICTO_EMOJI } from '../data/modules';
 import { marquerModuleTermine, getProgressionModule } from '../data/db';
 import { useTheme } from '../context/ThemeContext';
+//import { PICTO_EMOJI } from '../data/modules';
 
 export default function ModuleScreen({ route, navigation }) {
-  const { colors } = useTheme();
+  const { colors, isSimplifiedMode } = useTheme();
   const { moduleId } = route.params;
   const module = MODULES.find((m) => m.id === moduleId);
 
@@ -91,7 +92,18 @@ export default function ModuleScreen({ route, navigation }) {
           </Pressable>
         </Animated.View>
 
-        <Text style={styles.body}>{module.corpsApp}</Text>
+        {isSimplifiedMode ? (
+          <View style={styles.simplifiedBox}>
+            <View style={styles.pictoRow}>
+              {module.pictogrammes.map((p, i) => (
+                <Text key={i} style={styles.pictoEmoji}>{PICTO_EMOJI[p] ?? '📘'}</Text>
+              ))}
+            </View>
+            <Text style={styles.simplifiedText}>{module.resumeSms}</Text>
+          </View>
+        ) : (
+  <Text style={styles.body}>{module.corpsApp}</Text>
+)}
 
         {completed && (
           <View style={styles.completedBadge}>
@@ -127,5 +139,16 @@ function getStyles(colors) {
     completedText: { color: colors.accent, fontWeight: '700' },
     quizButton: { marginTop: 16, borderWidth: 2, borderColor: colors.accent, borderRadius: 10, paddingVertical: 14, alignItems: 'center' },
     quizButtonText: { color: colors.accent, fontSize: 15, fontWeight: '700' },
+    
+    simplifiedBox: {
+      backgroundColor: colors.surfaceAlt, borderRadius: 16, padding: 20,
+      alignItems: 'center',
+    },
+    pictoRow: { flexDirection: 'row', gap: 14, marginBottom: 16 },
+    pictoEmoji: { fontSize: 40 },
+    simplifiedText: {
+      fontSize: 20, lineHeight: 30, color: colors.textPrimary,
+      textAlign: 'center', fontWeight: '600',
+    },
   });
 }
