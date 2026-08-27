@@ -34,19 +34,46 @@ const HIGH_CONTRAST_COLORS = {
   gradientEnd: '#000000',
 };
 
+const FONT_SCALE_MIN = 1;
+const FONT_SCALE_MAX = 2;
+const FONT_SCALE_STEP = 0.15;
+
 const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
   const [isHighContrast, setIsHighContrast] = useState(false);
+  const [fontScale, setFontScale] = useState(1);
+  const [isSimplifiedMode, setIsSimplifiedMode] = useState(false);
 
-  const value = useMemo(
-    () => ({
+  const value = useMemo(() => {
+    function increaseFontScale() {
+      setFontScale((v) => Math.min(FONT_SCALE_MAX, +(v + FONT_SCALE_STEP).toFixed(2)));
+    }
+    function decreaseFontScale() {
+      setFontScale((v) => Math.max(FONT_SCALE_MIN, +(v - FONT_SCALE_STEP).toFixed(2)));
+    }
+    function resetFontScale() {
+      setFontScale(1);
+    }
+    function rf(size) {
+      return Math.round(size * fontScale);
+    }
+
+    return {
       isHighContrast,
       toggleContrast: () => setIsHighContrast((v) => !v),
       colors: isHighContrast ? HIGH_CONTRAST_COLORS : NORMAL_COLORS,
-    }),
-    [isHighContrast]
-  );
+      fontScale,
+      fontScaleMin: FONT_SCALE_MIN,
+      fontScaleMax: FONT_SCALE_MAX,
+      increaseFontScale,
+      decreaseFontScale,
+      resetFontScale,
+      rf,
+      isSimplifiedMode,
+      toggleSimplifiedMode: () => setIsSimplifiedMode((v) => !v),
+    };
+  }, [isHighContrast, fontScale, isSimplifiedMode]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
