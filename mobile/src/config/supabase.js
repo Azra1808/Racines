@@ -7,7 +7,7 @@
 
 export const SUPABASE_URL = 'https://bhxfuquthgsdjwuarsgp.supabase.co';
 
-// ⚠️ À remplacer par la vraie clé anon avant de tester sur téléphone.
-export const SUPABASE_ANON_KEY = 'COLLER_ICI_LA_CLE_ANON_PUBLIQUE';
+export const SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoeGZ1cXV0aGdzZGp3dWFyc2dwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwNTkyNDYsImV4cCI6MjEwMjYzNTI0Nn0.y7lsowS_ler-QN8qDZntA-XUwW7HjN60NcyNjn2UJe4';
 
 export const LULU_PARENT_URL = `${SUPABASE_URL}/functions/v1/lulu-parent`;
