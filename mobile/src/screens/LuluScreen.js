@@ -6,6 +6,7 @@ import ScreenHeader from '../components/ScreenHeader';
 import { MODULES } from '../data/modules';
 import { trouverReponse, LULU_FALLBACK } from '../data/luluResponses';
 import { useTheme } from '../context/ThemeContext';
+import { SUPABASE_URL, SUPABASE_ANON_KEY, LULU_PARENT_URL } from '../config/supabase';
 
 const MESSAGE_ACCUEIL = {
   id: 'accueil',
@@ -13,33 +14,88 @@ const MESSAGE_ACCUEIL = {
   texte: 'Bonjour, je suis Lulu 🌱 Posez-moi une question sur votre enfant, je vous orienterai vers le bon module.',
 };
 
+// Interroge le vrai moteur (recherche + garde-fous, T-031 à T-034).
+// Ne jamais laisser une erreur réseau bloquer le parent : en cas d'échec
+// (hors connexion, clé non configurée...), on retombe sur le mode local
+// par mots-clés, qui reste fonctionnel hors ligne.
+async function interrogerLuluParent(question) {
+  const reponse = await fetch(LULU_PARENT_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      apikey: SUPABASE_ANON_KEY,
+    },
+    body: JSON.stringify({ question, canal: 'app' }),
+  });
+  if (!reponse.ok) throw new Error(`Lulu Parent a répondu ${reponse.status}`);
+  return reponse.json();
+}
+
 export default function LuluScreen({ navigation }) {
   const { colors } = useTheme();
   const [messages, setMessages] = useState([MESSAGE_ACCUEIL]);
   const [saisie, setSaisie] = useState('');
+  const [enAttente, setEnAttente] = useState(false);
   const listRef = useRef(null);
 
   const styles = getStyles(colors);
 
-  function envoyerMessage() {
-    const texte = saisie.trim();
-    if (!texte) return;
+  function scrollVersLeBas() {
+    setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
+  }
 
-    const messageUtilisateur = { id: `u-${Date.now()}`, auteur: 'utilisateur', texte };
+  function reponseLocaleDeRepli(texte) {
     const regle = trouverReponse(texte);
     const module = regle ? MODULES.find((m) => m.id === regle.moduleId) : null;
+    return {
+      texte: regle ? regle.reponse : LULU_FALLBACK,
+      moduleSuggere: regle?.type === 'urgence' ? null : module,
+      estUrgent: regle?.type === 'urgence',
+      horsLigne: true,
+    };
+  }
+
+  async function envoyerMessage() {
+    const texte = saisie.trim();
+    if (!texte || enAttente) return;
+
+    const messageUtilisateur = { id: `u-${Date.now()}`, auteur: 'utilisateur', texte };
+    setMessages((prev) => [...prev, messageUtilisateur]);
+    setSaisie('');
+    setEnAttente(true);
+    scrollVersLeBas();
+
+    let contenuReponse;
+    try {
+      const resultat = await interrogerLuluParent(texte);
+      const module = resultat.source
+        ? MODULES.find((m) => m.id === resultat.source.unite_id)
+        : null;
+      contenuReponse = {
+        texte: resultat.texte,
+        moduleSuggere: module,
+        source: resultat.source
+          ? `${resultat.source.module_origine}`
+          : null,
+        // "alerte" et "renvoi_medical" doivent rester visuellement distincts
+        // (garde-fou du plan §5.3, testé en P0-07 du plan de QA).
+        estUrgent: resultat.type === 'alerte' || resultat.type === 'renvoi_medical',
+      };
+    } catch (_erreur) {
+      // Hors ligne ou fonction indisponible : mode dégradé, jamais un écran bloqué.
+      contenuReponse = reponseLocaleDeRepli(texte);
+    }
 
     const messageLulu = {
       id: `l-${Date.now()}`,
       auteur: 'lulu',
-      texte: regle ? regle.reponse : LULU_FALLBACK,
-      moduleSuggere: regle?.type === 'urgence' ? null : module,
-      estUrgent: regle?.type === 'urgence',
+      ...contenuReponse,
     };
 
-    setMessages((prev) => [...prev, messageUtilisateur, messageLulu]);
-    setSaisie('');
-    setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
+    setMessages((prev) => [...prev, messageLulu]);
+    setEnAttente(false);
+    scrollVersLeBas();
   }
 
   return (
@@ -65,6 +121,12 @@ export default function LuluScreen({ navigation }) {
                 <Text style={item.auteur === 'utilisateur' ? styles.bubbleTextUser : styles.bubbleTextLulu}>
                   {item.texte}
                 </Text>
+                {item.source && (
+                  <Text style={styles.sourceText}>Source : {item.source}</Text>
+                )}
+                {item.horsLigne && (
+                  <Text style={styles.sourceText}>Réponse hors connexion (mode dégradé)</Text>
+                )}
                 {item.moduleSuggere && (
                   <Pressable
                     style={styles.suggestionCard}
@@ -95,13 +157,15 @@ export default function LuluScreen({ navigation }) {
             accessibilityHint="Écrivez une question sur votre enfant puis envoyez-la."
           />
           <Pressable
-            style={styles.sendButton}
+            style={[styles.sendButton, enAttente && styles.sendButtonDisabled]}
             onPress={envoyerMessage}
+            disabled={enAttente}
             accessibilityRole="button"
             accessibilityLabel="Envoyer la question à Lulu"
             accessibilityHint="Lulu vous orientera vers un module approprié ou vers une aide urgente si nécessaire."
+            accessibilityState={{ disabled: enAttente }}
           >
-            <Text style={styles.sendButtonText}>➤</Text>
+            <Text style={styles.sendButtonText}>{enAttente ? '…' : '➤'}</Text>
           </Pressable>
         </View>
       </KeyboardAvoidingView>
@@ -128,6 +192,7 @@ function getStyles(colors) {
     suggestionTitle: { fontSize: 13, fontWeight: '700', color: colors.textPrimary, marginBottom: 4 },
     suggestionSource: { fontSize: 11, color: colors.textSecondary, marginBottom: 4 },
     suggestionArrow: { fontSize: 12, color: colors.accent, fontWeight: '600' },
+    sourceText: { fontSize: 11, color: colors.textMuted, marginTop: 6, fontStyle: 'italic' },
     inputRow: {
       flexDirection: 'row', alignItems: 'center', padding: 12, gap: 8,
       borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.background,
@@ -140,6 +205,7 @@ function getStyles(colors) {
       width: 42, height: 42, borderRadius: 21, backgroundColor: colors.accent,
       alignItems: 'center', justifyContent: 'center',
     },
+    sendButtonDisabled: { opacity: 0.5 },
     sendButtonText: { color: colors.accentText, fontSize: 18 },
   });
 }
