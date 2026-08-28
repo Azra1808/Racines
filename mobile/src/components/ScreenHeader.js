@@ -29,7 +29,7 @@ export default function ScreenHeader({ title, subtitle, onBack }) {
             hitSlop={12}
             accessibilityLabel="Ouvrir les réglages d'accessibilité"
           >
-            <Text style={styles.accessIcon}>♿</Text>
+            <Text style={styles.accessIcon}>⚙️</Text>
           </Pressable>
         </View>
       </SafeAreaView>

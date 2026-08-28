@@ -55,7 +55,7 @@ export default function HomeScreen({ navigation }) {
             style={styles.contrastButton}
             accessibilityLabel="Ouvrir les réglages d'accessibilité"
           >
-            <Text style={styles.contrastIcon}>♿</Text>
+            <Text style={styles.contrastIcon}>⚙️</Text>
           </Pressable>
         </View>
 
