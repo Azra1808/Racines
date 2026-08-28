@@ -2,7 +2,9 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, Animated } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import ScreenHeader from '../components/ScreenHeader';
-import { MODULES, PICTO_EMOJI } from '../data/modules';
+import PictoIcon from '../components/icons/PictoIcon';
+import UiIcon from '../components/icons/UiIcon';
+import { MODULES } from '../data/modules';
 import { getToutesLesProgressions } from '../data/db';
 import { useTheme } from '../context/ThemeContext';
 
@@ -13,30 +15,37 @@ function AnimatedCard({ item, index, progressions, colors, onPress }) {
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 400, delay: index * 80, useNativeDriver: true }),
-      Animated.timing(slideAnim, { toValue: 0, duration: 400, delay: index * 80, useNativeDriver: true }),
+      Animated.timing(fadeAnim, { toValue: 1, duration: 400, delay: index * 60, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 400, delay: index * 60, useNativeDriver: true }),
     ]).start();
   }, []);
+
+  const styles = getStyles(colors);
+  const bilanDone = !!progressions[item.id]?.bilan_termine;
+  const moduleTermine = !!progressions[item.id]?.module_termine;
 
   return (
     <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }, { scale: scaleAnim }] }}>
       <Pressable
-        style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: colors.background === '#000000' ? 1 : 0 }]}
+        style={[styles.card, { borderColor: colors.border, borderWidth: colors.background === '#000000' ? 1 : 0 }]}
         onPress={onPress}
-        onPressIn={() => Animated.spring(scaleAnim, { toValue: 0.96, useNativeDriver: true }).start()}
+        onPressIn={() => Animated.spring(scaleAnim, { toValue: 0.97, useNativeDriver: true }).start()}
         onPressOut={() => Animated.spring(scaleAnim, { toValue: 1, friction: 4, useNativeDriver: true }).start()}
       >
         <View style={styles.iconWrap}>
-          <Text style={styles.icon}>{PICTO_EMOJI[item.pictogrammes[0]] ?? '📘'}</Text>
-          {progressions[item.id]?.module_termine ? (
+          <PictoIcon name={item.pictogrammes[0]} size={26} color={colors.accent} />
+          {bilanDone ? (
             <View style={styles.doneBadge}>
-              <Text style={styles.doneBadgeText}>✓</Text>
+              <UiIcon name="check" size={11} color="#ffffff" />
             </View>
+          ) : moduleTermine ? (
+            <View style={[styles.doneBadge, styles.readBadge]} />
           ) : null}
         </View>
         <View style={styles.cardText}>
           <Text style={styles.cardCategory}>{item.thematique}</Text>
           <Text style={styles.cardTitle}>{item.titre}</Text>
+          <Text style={styles.cardMeta}>{item.sousModules.length} parties · 20 questions</Text>
         </View>
         <Text style={styles.chevron}>›</Text>
       </Pressable>
@@ -47,6 +56,7 @@ function AnimatedCard({ item, index, progressions, colors, onPress }) {
 export default function CatalogScreen({ navigation }) {
   const [progressions, setProgressions] = useState({});
   const { colors } = useTheme();
+  const styles = getStyles(colors);
 
   useFocusEffect(
     useCallback(() => {
@@ -79,28 +89,31 @@ export default function CatalogScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f7f4ee' },
-  list: { padding: 16, paddingTop: 20 },
-  card: {
-    flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff',
-    borderRadius: 16, padding: 14, marginBottom: 12,
-    shadowColor: '#1c2733', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06, shadowRadius: 6, elevation: 2,
-  },
-  iconWrap: {
-    width: 48, height: 48, borderRadius: 14, backgroundColor: '#eef3ea',
-    alignItems: 'center', justifyContent: 'center', marginRight: 14, position: 'relative',
-  },
-  icon: { fontSize: 24 },
-  cardText: { flex: 1 },
-  cardCategory: { fontSize: 11, fontWeight: '700', color: '#c98a2e', textTransform: 'uppercase', marginBottom: 2 },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: '#1c2733' },
-  chevron: { fontSize: 22, color: '#c9c0ad', marginLeft: 8 },
-  doneBadge: {
-    position: 'absolute', top: -4, right: -4,
-    width: 20, height: 20, borderRadius: 10,
-    backgroundColor: '#1c6b3f', alignItems: 'center', justifyContent: 'center',
-  },
-  doneBadgeText: { color: '#fff', fontSize: 11, fontWeight: '800' },
-});
+function getStyles(colors) {
+  return StyleSheet.create({
+    container: { flex: 1 },
+    list: { padding: 16, paddingTop: 20 },
+    card: {
+      flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface,
+      borderRadius: 18, padding: 14, marginBottom: 12,
+      shadowColor: '#1c2733', shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.07, shadowRadius: 8, elevation: 2,
+    },
+    iconWrap: {
+      width: 50, height: 50, borderRadius: 15, backgroundColor: colors.surfaceAlt,
+      alignItems: 'center', justifyContent: 'center', marginRight: 14, position: 'relative',
+    },
+    cardText: { flex: 1 },
+    cardCategory: { fontSize: 11, fontWeight: '700', color: colors.accentSoft, textTransform: 'uppercase', marginBottom: 2 },
+    cardTitle: { fontSize: 16, fontWeight: '700', color: colors.textPrimary },
+    cardMeta: { fontSize: 11, color: colors.textMuted, marginTop: 3 },
+    chevron: { fontSize: 22, color: colors.textMuted, marginLeft: 8 },
+    doneBadge: {
+      position: 'absolute', top: -4, right: -4,
+      width: 20, height: 20, borderRadius: 10,
+      backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center',
+      borderWidth: 2, borderColor: colors.surface,
+    },
+    readBadge: { backgroundColor: colors.accentSoft },
+  });
+}

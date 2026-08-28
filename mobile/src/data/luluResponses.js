@@ -46,7 +46,7 @@ export const LULU_RULES = [
 ];
 
 export const LULU_FALLBACK =
-  'Je ne suis pas encore capable de répondre précisément à ça, mais vous trouverez sûrement une réponse dans nos 8 modules — voulez-vous y jeter un œil ?';
+  'Je ne suis pas encore capable de répondre précisément à ça, mais vous trouverez sûrement une réponse dans nos 10 modules — voulez-vous y jeter un œil ?';
 
 export function trouverReponse(texte) {
   const texteNormalise = texte.toLowerCase();

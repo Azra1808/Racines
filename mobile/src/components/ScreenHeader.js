@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
+import UiIcon from './icons/UiIcon';
 
 export default function ScreenHeader({ title, subtitle, onBack }) {
   const { colors, rf } = useTheme();
@@ -29,7 +30,7 @@ export default function ScreenHeader({ title, subtitle, onBack }) {
             hitSlop={12}
             accessibilityLabel="Ouvrir les réglages d'accessibilité"
           >
-            <Text style={styles.accessIcon}>⚙️</Text>
+            <UiIcon name="settings" size={17} color="#ffffff" />
           </Pressable>
         </View>
       </SafeAreaView>
