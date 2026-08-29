@@ -47,11 +47,42 @@ describe('dictionnaire de traduction', () => {
     const partielles = LANGUES.map((l) => l.id).filter((id) => !COMPLETES.includes(id));
     for (const code of partielles) {
       const couverture = reference.filter((c) => TRADUCTIONS[code][c] !== undefined).length;
-      // Elles doivent au moins couvrir la navigation de base.
-      expect(couverture).toBeGreaterThan(20);
+      // Seuil plancher : la couverture acquise ne doit pas régresser.
+      // Le relever quand un locuteur natif aura relu et complété le bloc.
+      expect(couverture).toBeGreaterThanOrEqual(41);
     }
     // Et l'application doit pouvoir le dire à l'utilisateur.
     expect(TRADUCTIONS.fr.lang_partial_notice).toBeTruthy();
     expect(TRADUCTIONS.en.lang_partial_notice).toBeTruthy();
+  });
+
+  it('couvre en langue locale les gestes de navigation de base', () => {
+    // Ce qu'un parent touche à chaque écran : revenir, ouvrir un module,
+    // écouter, continuer. Si l'un de ces gestes repasse au français, la
+    // langue locale n'a plus d'utilité pratique.
+    const essentiels = [
+      'nav_back',
+      'a11y_back',
+      'catalog_title',
+      'common_open_module',
+      'channel_open_module',
+      'common_listen',
+      'module_listen',
+      'common_next',
+      'quiz_next_question',
+    ];
+    for (const code of ['ewo', 'bas']) {
+      const absents = essentiels.filter((c) => TRADUCTIONS[code][c] === undefined);
+      expect(absents).toEqual([]);
+    }
+  });
+
+  it('n\'introduit aucune variable non traduite en langue locale', () => {
+    const variables = (t) => (t.match(/\{(\w+)\}/g) ?? []).sort().join(',');
+    for (const code of ['ewo', 'bas']) {
+      for (const cle of Object.keys(TRADUCTIONS[code])) {
+        expect(variables(TRADUCTIONS[code][cle])).toBe(variables(TRADUCTIONS.fr[cle]));
+      }
+    }
   });
 });

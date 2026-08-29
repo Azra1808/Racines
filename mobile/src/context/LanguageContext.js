@@ -384,6 +384,26 @@ export const TRADUCTIONS = {
     common_open_module: 'Fulu bikalate',
     common_next: 'Ake',
     common_listen: 'Wôk',
+    // --- Ajouts composés à partir du vocabulaire ci-dessus ------------------
+    // Aucune phrase nouvelle : chaque entrée reprend un mot déjà traduit, un
+    // sigle ou un nom propre. Origine indiquée en fin de ligne. Reste à faire
+    // relire par un locuteur natif, comme le reste de ce bloc.
+    catalog_title: "Bikalate", // de home_feature_modules « Bikalate 10 »
+    a11y_back: "Kal si", // identique à nav_back
+    a11y_open_accessibility: "Ayôñ asu bôt bese", // identique à nav_accessibility
+    channel_open_module: "Fulu bikalate", // identique à common_open_module
+    module_listen: "Wôk bikalate", // common_listen « Wôk » + bikalate, même schéma que « Fulu bikalate »
+    quiz_next_question: "Ake", // identique à common_next
+    quiz_next_part: "Ake", // identique à common_next
+    quiz_back_module: "Kal si", // identique à nav_back
+    settings_theme_label: "Mintaña {nom}", // mintaña, de settings_theme_title
+    home_btn_channels: "Si internet te", // identique à home_feature_offline
+    channel_app: "App", // de settings_theme_subtitle « mintaña ma app »
+    quiz_title: "Quiz", // emprunt, inchangé
+    lulu_title: "Lulu Parent", // nom propre, inchangé
+    channel_sms: "SMS", // sigle, inchangé
+    channel_ussd: "USSD", // sigle, inchangé
+    channel_ivr: "IVR", // sigle, inchangé
   },
   // Bassa — traduction de meilleur effort, NON VALIDÉE (voir avertissement
   // en haut de fichier). À faire relire avant diffusion.
@@ -413,6 +433,26 @@ export const TRADUCTIONS = {
     common_open_module: 'Fulu bikalati',
     common_next: 'Ke',
     common_listen: 'Séŋgi',
+    // --- Ajouts composés à partir du vocabulaire ci-dessus ------------------
+    // Aucune phrase nouvelle : chaque entrée reprend un mot déjà traduit, un
+    // sigle ou un nom propre. Origine indiquée en fin de ligne. Reste à faire
+    // relire par un locuteur natif, comme le reste de ce bloc.
+    catalog_title: "Bikalati", // de home_feature_modules « Bikalati 10 »
+    a11y_back: "Kal si", // identique à nav_back
+    a11y_open_accessibility: "Manyaka asu bôt bese", // identique à nav_accessibility
+    channel_open_module: "Fulu bikalati", // identique à common_open_module
+    module_listen: "Séŋgi bikalati", // common_listen « Séŋgi » + bikalati, même schéma que « Fulu bikalati »
+    quiz_next_question: "Ke", // identique à common_next
+    quiz_next_part: "Ke", // identique à common_next
+    quiz_back_module: "Kal si", // identique à nav_back
+    settings_theme_label: "Mintaña {nom}", // mintaña, de settings_theme_title
+    home_btn_channels: "Ndi internet te", // identique à home_feature_offline
+    channel_app: "App", // de settings_theme_subtitle « mintaña ma app »
+    quiz_title: "Quiz", // emprunt, inchangé
+    lulu_title: "Lulu Parent", // nom propre, inchangé
+    channel_sms: "SMS", // sigle, inchangé
+    channel_ussd: "USSD", // sigle, inchangé
+    channel_ivr: "IVR", // sigle, inchangé
   },
 };
 
