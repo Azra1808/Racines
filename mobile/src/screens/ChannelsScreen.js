@@ -21,6 +21,7 @@ import PictoIcon from '../components/icons/PictoIcon';
 import { useTheme } from '../context/ThemeContext';
 import { MODULES } from '../data/modules';
 import { resoudreEcranUssd, LIMITE_CARACTERES_USSD, sansAccents } from '../data/ussdMenu';
+import { useLanguage } from '../context/LanguageContext';
 
 const LIMITE_SMS = 160;
 // Débit moyen d'une synthèse vocale française, mesuré sur les scripts du corpus.
@@ -28,26 +29,26 @@ const CARACTERES_PAR_SECONDE = 15;
 
 export default function ChannelsScreen({ navigation }) {
   const { colors, rf } = useTheme();
+  const { t } = useLanguage();
   const [index, setIndex] = useState(0);
   const unite = MODULES[index];
   const styles = getStyles(colors);
 
-  const rendus = construireRendus(unite);
+  const rendus = construireRendus(unite, t);
 
   return (
     <View style={styles.container}>
       <ScreenHeader
-        title="Un contenu, cinq portes"
-        subtitle="Le même module, rendu pour chaque canal"
+        title={t('channels_title')}
+        subtitle={t('channels_subtitle')}
         onBack={() => navigation.goBack()}
       />
 
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={[styles.intro, { fontSize: rf(13) }]}>
-          Le contenu est écrit <Text style={styles.fort}>une seule fois</Text>.
-          Chaque canal en sélectionne les champs dont il a besoin. Changez de
-          module : les cinq rendus ci-dessous changent ensemble. Touchez un
-          encadré pour ouvrir le canal correspondant.
+          {t('channels_intro_1')}{' '}
+          <Text style={styles.fort}>{t('channels_intro_strong')}</Text>
+          {t('channels_intro_2')}
         </Text>
 
         {/* --- Sélecteur de module --- */}
@@ -62,7 +63,7 @@ export default function ChannelsScreen({ navigation }) {
               onPress={() => setIndex(i)}
               style={[styles.puce, i === index && styles.puceActive]}
               accessibilityRole="button"
-              accessibilityLabel={`Module ${i + 1} : ${m.titre}`}
+              accessibilityLabel={t('module_select', { n: i + 1, titre: m.titre })}
               accessibilityState={{ selected: i === index }}
             >
               <Text style={[styles.puceTexte, i === index && styles.puceTexteActif]}>
@@ -131,10 +132,7 @@ export default function ChannelsScreen({ navigation }) {
 
         <View style={styles.conclusion}>
           <Text style={[styles.conclusionTexte, { fontSize: rf(12) }]}>
-            Ajouter un canal, c'est écrire un adaptateur. Ajouter une langue,
-            c'est traduire les mêmes champs. Ni l'un ni l'autre ne demande de
-            réécrire les modules — c'est ce qui rend l'extension nationale
-            soutenable.
+            {t('channels_conclusion')}
           </Text>
         </View>
       </ScrollView>
@@ -142,48 +140,48 @@ export default function ChannelsScreen({ navigation }) {
   );
 }
 
-function construireRendus(unite) {
+function construireRendus(unite, t) {
   const ecranUssd = sansAccents(resoudreEcranUssd(['2', String(indexDansPage(unite))]).texte);
   const secondes = Math.round(unite.scriptAudioIvr.length / CARACTERES_PAR_SECONDE);
 
   return [
     {
-      canal: 'Application',
+      canal: t('channel_app'),
       champ: 'corpsApp',
       icone: 'book',
       mesure: `${unite.corpsApp.length} car.`,
       texte: `${unite.corpsApp.slice(0, 220).trimEnd()}…`,
-      action: { route: 'Module', params: { moduleId: unite.id }, libelle: 'Lire le module complet' },
+      action: { route: 'Module', params: { moduleId: unite.id }, libelle: t('channel_open_module') },
     },
     {
-      canal: 'SMS',
+      canal: t('channel_sms'),
       champ: 'resumeSms',
       icone: 'mail',
       mesure: `${unite.resumeSms.length}/${LIMITE_SMS}`,
       texte: unite.resumeSms,
-      action: { route: 'Sms', libelle: 'Envoyer un conseil par SMS' },
+      action: { route: 'Sms', libelle: t('channel_open_sms') },
     },
     {
-      canal: 'USSD',
+      canal: t('channel_ussd'),
       champ: 'resumeSms → écran 182 car.',
       icone: 'noSignal',
       mesure: `${ecranUssd.length}/${LIMITE_CARACTERES_USSD}`,
       texte: ecranUssd,
-      action: { route: 'Ussd', libelle: 'Ouvrir le simulateur USSD' },
+      action: { route: 'Ussd', libelle: t('channel_open_ussd') },
     },
     {
-      canal: 'Vocal (IVR)',
+      canal: t('channel_ivr'),
       champ: 'scriptAudioIvr',
       icone: 'call',
       mesure: `~${secondes} s`,
       texte: unite.scriptAudioIvr,
-      action: { route: 'Ivr', libelle: 'Écouter le parcours vocal' },
+      action: { route: 'Ivr', libelle: t('channel_open_ivr') },
     },
     {
       // Cinquième porte : la lecture simplifiée, pour un parent qui ne lit
       // pas. Elle n'ouvre pas de simulateur — le rendu EST la démonstration,
       // on voit les pictogrammes réels de l'unité.
-      canal: 'Lecture simplifiée',
+      canal: t('channel_simplified'),
       champ: 'pictogrammes',
       icone: 'image',
       mesure: `${unite.pictogrammes.length} pictos`,

@@ -19,9 +19,11 @@ import UiIcon from '../components/icons/UiIcon';
 import { useTheme } from '../context/ThemeContext';
 import { MODULES } from '../data/modules';
 import { composerSms, nombreDeSms, lienSms, LIMITE_SMS } from '../data/smsCanal';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function SmsScreen({ navigation }) {
   const { colors, rf } = useTheme();
+  const { t } = useLanguage();
   const [index, setIndex] = useState(0);
   const unite = MODULES[index];
   const texte = composerSms(unite);
@@ -50,8 +52,8 @@ export default function SmsScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <ScreenHeader
-        title="Canal SMS"
-        subtitle="Le conseil, envoyé depuis votre téléphone"
+        title={t('sms_title')}
+        subtitle={t('sms_subtitle')}
         onBack={() => navigation.goBack()}
       />
 
@@ -73,7 +75,7 @@ export default function SmsScreen({ navigation }) {
               onPress={() => setIndex(i)}
               style={[styles.puce, i === index && styles.puceActive]}
               accessibilityRole="button"
-              accessibilityLabel={`Module ${i + 1} : ${m.titre}`}
+              accessibilityLabel={t('module_select', { n: i + 1, titre: m.titre })}
               accessibilityState={{ selected: i === index }}
             >
               <Text style={[styles.puceTexte, i === index && styles.puceTexteActif]}>
@@ -108,11 +110,11 @@ export default function SmsScreen({ navigation }) {
           style={({ pressed }) => [styles.bouton, pressed && styles.boutonPresse]}
           onPress={envoyer}
           accessibilityRole="button"
-          accessibilityLabel={`Envoyer par SMS le conseil du module ${unite.titre}`}
-          accessibilityHint="Ouvre la messagerie du téléphone avec le conseil déjà écrit."
+          accessibilityLabel={t('sms_send_a11y', { titre: unite.titre })}
+          accessibilityHint={t('sms_send_hint')}
         >
           <UiIcon name="mail" size={16} color={colors.accentText} />
-          <Text style={styles.boutonTexte}>Envoyer ce conseil par SMS</Text>
+          <Text style={styles.boutonTexte}>{t('sms_send_cta')}</Text>
         </Pressable>
 
         {Platform.OS === 'web' && (
@@ -124,10 +126,10 @@ export default function SmsScreen({ navigation }) {
 
         <View style={styles.disclaimer}>
           <Text style={[styles.disclaimerText, { fontSize: rf(11) }]}>
-            <Text style={styles.fort}>Disponible aujourd'hui :</Text> l'envoi individuel
+            <Text style={styles.fort}>{t('sms_available_today')}</Text> l'envoi individuel
             par un facilitateur, depuis sa propre ligne, sans aucune infrastructure
             ni coût pour le programme.{'\n\n'}
-            <Text style={styles.fort}>Phase d'incubation :</Text> la diffusion
+            <Text style={styles.fort}>{t('sms_incubation')}</Text> la diffusion
             automatique de rappels hebdomadaires à grande échelle, qui suppose un
             raccordement à une passerelle opérateur facturée au message. Le coût
             figure au budget prévisionnel.

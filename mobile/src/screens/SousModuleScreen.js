@@ -5,9 +5,11 @@ import PictoIcon from '../components/icons/PictoIcon';
 import UiIcon from '../components/icons/UiIcon';
 import { MODULES } from '../data/modules';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function SousModuleScreen({ route, navigation }) {
   const { colors } = useTheme();
+  const { t } = useLanguage();
   const { moduleId, sousModuleIndex } = route.params;
   const module = MODULES.find((m) => m.id === moduleId);
   const sousModule = module?.sousModules?.[sousModuleIndex];
@@ -22,7 +24,7 @@ export default function SousModuleScreen({ route, navigation }) {
   if (!module || !sousModule) {
     return (
       <View style={styles.container}>
-        <ScreenHeader title="Partie introuvable" onBack={() => navigation.goBack()} />
+        <ScreenHeader title={t('submodule_not_found')} onBack={() => navigation.goBack()} />
       </View>
     );
   }
@@ -31,7 +33,7 @@ export default function SousModuleScreen({ route, navigation }) {
     <View style={styles.container}>
       <ScreenHeader
         title={sousModule.titre}
-        subtitle={`Partie ${sousModuleIndex + 1} · ${module.titre}`}
+        subtitle={t('submodule_header', { n: sousModuleIndex + 1, titre: module.titre })}
         onBack={() => navigation.goBack()}
       />
       <ScrollView contentContainerStyle={styles.content}>
@@ -52,10 +54,10 @@ export default function SousModuleScreen({ route, navigation }) {
             style={styles.button}
             onPress={() => navigation.navigate('Quiz', { moduleId: module.id, mode: 'submodule', sousModuleIndex })}
             accessibilityRole="button"
-            accessibilityLabel={`Répondre aux cinq questions de ${sousModule.titre}`}
+            accessibilityLabel={t('submodule_answer_a11y', { titre: sousModule.titre })}
           >
             <UiIcon name="quiz" size={18} color={colors.accentText} />
-            <Text style={styles.buttonText}>Commencer les 5 questions</Text>
+            <Text style={styles.buttonText}>{t('submodule_start', { n: 5 })}</Text>
           </Pressable>
         </Animated.View>
       </ScrollView>

@@ -4,9 +4,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
 import UiIcon from './icons/UiIcon';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function ScreenHeader({ title, subtitle, onBack }) {
   const { colors, rf } = useTheme();
+  const { t } = useLanguage();
   const navigation = useNavigation();
 
   return (
@@ -19,7 +21,7 @@ export default function ScreenHeader({ title, subtitle, onBack }) {
               style={styles.iconButton}
               hitSlop={12}
               accessibilityRole="button"
-              accessibilityLabel="Revenir à l'écran précédent"
+              accessibilityLabel={t('a11y_back')}
             >
               <UiIcon name="arrowLeft" size={19} color="#ffffff" />
             </Pressable>
@@ -35,7 +37,7 @@ export default function ScreenHeader({ title, subtitle, onBack }) {
             style={styles.iconButton}
             hitSlop={12}
             accessibilityRole="button"
-            accessibilityLabel="Ouvrir les réglages d'accessibilité"
+            accessibilityLabel={t('a11y_open_accessibility')}
           >
             <UiIcon name="settings" size={17} color="#ffffff" />
           </Pressable>

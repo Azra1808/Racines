@@ -18,11 +18,13 @@ import { useTheme } from '../context/ThemeContext';
 import {
   CODE_COURT, LIMITE_CARACTERES_USSD, resoudreEcranUssd, sansAccents,
 } from '../data/ussdMenu';
+import { useLanguage } from '../context/LanguageContext';
 
 const TOUCHES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
 
 export default function UssdScreen({ navigation }) {
   const { colors, rf } = useTheme();
+  const { t } = useLanguage();
   const [compose, setCompose] = useState('');
   const [etapes, setEtapes] = useState(null); // null = pas encore de session
   const [saisie, setSaisie] = useState('');
@@ -67,8 +69,8 @@ export default function UssdScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <ScreenHeader
-        title="Canal USSD"
-        subtitle="Parcours sur téléphone basique"
+        title={t('ussd_title')}
+        subtitle={t('ussd_subtitle')}
         onBack={() => navigation.goBack()}
       />
 
@@ -86,8 +88,8 @@ export default function UssdScreen({ navigation }) {
             accessibilityLiveRegion="polite"
             accessibilityLabel={
               sessionOuverte
-                ? `Écran USSD : ${texteEcran}`
-                : `Clavier de composition. Numéro composé : ${compose || 'vide'}`
+                ? t('ussd_screen_a11y', { texte: texteEcran })
+                : t('ussd_dialer_a11y', { compose: compose || '—' })
             }
           >
             {!sessionOuverte ? (
@@ -97,8 +99,8 @@ export default function UssdScreen({ navigation }) {
                 </Text>
                 <Text style={[styles.phoneHint, { fontSize: rf(11) }]}>
                   {compose === CODE_COURT
-                    ? 'Appuyez sur Appeler'
-                    : `Composez ${CODE_COURT}`}
+                    ? t('ivr_press_call')
+                    : t('ussd_dial', { code: CODE_COURT })}
                 </Text>
               </>
             ) : (
@@ -109,7 +111,7 @@ export default function UssdScreen({ navigation }) {
                 {!sessionTerminee && (
                   <View style={styles.replyRow}>
                     <Text style={[styles.replyLabel, { fontSize: rf(11) }]}>
-                      Reponse :
+                      {t('ussd_answer')}
                     </Text>
                     <Text style={[styles.replyValue, { fontSize: rf(14) }]}>
                       {saisie || '_'}
@@ -118,7 +120,7 @@ export default function UssdScreen({ navigation }) {
                 )}
                 {sessionTerminee && (
                   <Text style={[styles.sessionEnd, { fontSize: rf(11) }]}>
-                    — Session terminee —
+                    {t('ussd_session_over')}
                   </Text>
                 )}
               </>
@@ -134,7 +136,7 @@ export default function UssdScreen({ navigation }) {
                 onPress={() => appuyerTouche(touche)}
                 disabled={sessionTerminee}
                 accessibilityRole="button"
-                accessibilityLabel={`Touche ${touche}`}
+                accessibilityLabel={t('ussd_key', { touche })}
               >
                 <Text style={[styles.keyText, { fontSize: rf(19) }]}>{touche}</Text>
               </Pressable>
@@ -148,9 +150,9 @@ export default function UssdScreen({ navigation }) {
                   style={[styles.action, styles.actionSecondary]}
                   onPress={() => setCompose((v) => v.slice(0, -1))}
                   accessibilityRole="button"
-                  accessibilityLabel="Effacer le dernier caractère"
+                  accessibilityLabel={t('ussd_clear_a11y')}
                 >
-                  <Text style={styles.actionSecondaryText}>Effacer</Text>
+                  <Text style={styles.actionSecondaryText}>{t('ussd_clear')}</Text>
                 </Pressable>
                 <Pressable
                   style={[
@@ -161,10 +163,10 @@ export default function UssdScreen({ navigation }) {
                   onPress={appeler}
                   disabled={compose !== CODE_COURT}
                   accessibilityRole="button"
-                  accessibilityLabel={`Appeler le code ${CODE_COURT}`}
+                  accessibilityLabel={t('ussd_call_code', { code: CODE_COURT })}
                   accessibilityState={{ disabled: compose !== CODE_COURT }}
                 >
-                  <Text style={styles.actionPrimaryText}>Appeler</Text>
+                  <Text style={styles.actionPrimaryText}>{t('ussd_call')}</Text>
                 </Pressable>
               </>
             ) : (
@@ -173,9 +175,9 @@ export default function UssdScreen({ navigation }) {
                   style={[styles.action, styles.actionSecondary]}
                   onPress={raccrocher}
                   accessibilityRole="button"
-                  accessibilityLabel="Raccrocher et recommencer"
+                  accessibilityLabel={t('ussd_hangup_a11y')}
                 >
-                  <Text style={styles.actionSecondaryText}>Raccrocher</Text>
+                  <Text style={styles.actionSecondaryText}>{t('ussd_hangup')}</Text>
                 </Pressable>
                 <Pressable
                   style={[
@@ -186,10 +188,10 @@ export default function UssdScreen({ navigation }) {
                   onPress={envoyerSaisie}
                   disabled={!saisie || sessionTerminee}
                   accessibilityRole="button"
-                  accessibilityLabel="Envoyer la réponse"
+                  accessibilityLabel={t('ussd_send_a11y')}
                   accessibilityState={{ disabled: !saisie || sessionTerminee }}
                 >
-                  <Text style={styles.actionPrimaryText}>Envoyer</Text>
+                  <Text style={styles.actionPrimaryText}>{t('ussd_send')}</Text>
                 </Pressable>
               </>
             )}
@@ -204,8 +206,8 @@ export default function UssdScreen({ navigation }) {
             </Text>
             <Text style={[styles.techHint, { fontSize: rf(10) }]}>
               {ecran.type === 'CON'
-                ? 'CON : la session reste ouverte, le parent peut répondre.'
-                : 'END : la session se ferme, comme sur un vrai réseau.'}
+                ? t('ussd_con_hint')
+                : t('ussd_end_hint')}
             </Text>
           </View>
         )}

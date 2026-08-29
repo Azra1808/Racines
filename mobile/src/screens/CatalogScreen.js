@@ -7,8 +7,9 @@ import UiIcon from '../components/icons/UiIcon';
 import { MODULES } from '../data/modules';
 import { getToutesLesProgressions } from '../data/db';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 
-function AnimatedCard({ item, index, progressions, colors, onPress }) {
+function AnimatedCard({ item, index, progressions, colors, onPress, t }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -30,8 +31,8 @@ function AnimatedCard({ item, index, progressions, colors, onPress }) {
         style={[styles.card, { borderColor: colors.border, borderWidth: colors.background === '#000000' ? 1 : 0 }]}
         onPress={onPress}
         accessibilityRole="button"
-        accessibilityLabel={`${item.titre}, ${item.thematique}${bilanDone ? ', bilan terminé' : moduleTermine ? ', en cours' : ''}`}
-        accessibilityHint="Ouvre le module et ses sous-parties."
+        accessibilityLabel={`${item.titre}, ${item.thematique}${bilanDone ? ', ' + t('catalog_state_done') : moduleTermine ? ', ' + t('catalog_state_started') : ''}`}
+        accessibilityHint={t('catalog_hint')}
         onPressIn={() => Animated.spring(scaleAnim, { toValue: 0.97, useNativeDriver: true }).start()}
         onPressOut={() => Animated.spring(scaleAnim, { toValue: 1, friction: 4, useNativeDriver: true }).start()}
       >
@@ -48,7 +49,7 @@ function AnimatedCard({ item, index, progressions, colors, onPress }) {
         <View style={styles.cardText}>
           <Text style={styles.cardCategory}>{item.thematique}</Text>
           <Text style={styles.cardTitle}>{item.titre}</Text>
-          <Text style={styles.cardMeta}>{item.sousModules.length} parties · 20 questions</Text>
+          <Text style={styles.cardMeta}>{t('catalog_card_meta', { parties: item.sousModules.length, questions: 20 })}</Text>
         </View>
         <Text style={styles.chevron}>›</Text>
       </Pressable>
@@ -59,6 +60,7 @@ function AnimatedCard({ item, index, progressions, colors, onPress }) {
 export default function CatalogScreen({ navigation }) {
   const [progressions, setProgressions] = useState({});
   const { colors } = useTheme();
+  const { t } = useLanguage();
   const styles = getStyles(colors);
 
   useFocusEffect(
@@ -70,8 +72,8 @@ export default function CatalogScreen({ navigation }) {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScreenHeader
-        title="Les modules"
-        subtitle={`${MODULES.length} thématiques du programme officiel`}
+        title={t('catalog_title')}
+        subtitle={t('catalog_subtitle', { n: MODULES.length })}
         onBack={() => navigation.goBack()}
       />
       <FlatList
@@ -79,7 +81,7 @@ export default function CatalogScreen({ navigation }) {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         renderItem={({ item, index }) => (
-          <AnimatedCard
+          <AnimatedCard t={t}
             item={item}
             index={index}
             progressions={progressions}

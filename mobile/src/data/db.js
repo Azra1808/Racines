@@ -25,6 +25,10 @@ async function getDb() {
         derniere_maj TEXT NOT NULL,
         PRIMARY KEY (module_id, sous_module_index)
       );
+      CREATE TABLE IF NOT EXISTS preferences (
+        cle TEXT PRIMARY KEY NOT NULL,
+        valeur TEXT NOT NULL
+      );
     `);
     // Migration douce pour les bases créées avant l'ajout du bilan.
     try {
@@ -122,4 +126,39 @@ export async function getToutesLesProgressions() {
 export async function getProgressionModule(moduleId) {
   const db = await getDb();
   return db.getFirstAsync('SELECT * FROM progression WHERE module_id = ?;', [moduleId]);
+}
+
+// --- Préférences d'affichage -------------------------------------------
+//
+// Langue, thème, taille de police et mode simplifié sont conservés d'un
+// lancement à l'autre. Sans cela, un parent malvoyant devrait réactiver son
+// contraste élevé et sa taille de texte à chaque ouverture de
+// l'application — un réglage d'accessibilité qui ne tient pas n'est pas un
+// réglage d'accessibilité.
+//
+// Aucun réseau, aucun compte : tout reste sur le téléphone.
+
+export async function lirePreferences() {
+  try {
+    const db = await getDb();
+    const lignes = await db.getAllAsync('SELECT cle, valeur FROM preferences;');
+    return Object.fromEntries(lignes.map((l) => [l.cle, l.valeur]));
+  } catch (_e) {
+    // Une base illisible ne doit jamais empêcher l'application de démarrer :
+    // on repart simplement sur les valeurs par défaut.
+    return {};
+  }
+}
+
+export async function enregistrerPreference(cle, valeur) {
+  try {
+    const db = await getDb();
+    await db.runAsync(
+      `INSERT INTO preferences (cle, valeur) VALUES (?, ?)
+       ON CONFLICT(cle) DO UPDATE SET valeur = excluded.valeur;`,
+      [cle, String(valeur)]
+    );
+  } catch (_e) {
+    // Échec silencieux : le réglage reste actif pour la session en cours.
+  }
 }

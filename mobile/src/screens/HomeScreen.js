@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable, Animated, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Animated, Dimensions, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle } from 'react-native-svg';
@@ -174,6 +174,11 @@ export default function HomeScreen({ navigation }) {
       {!isHighContrast && <RootTracery color="rgba(201,138,46,0.22)" />}
 
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+        <ScrollView
+          contentContainerStyle={styles.defilement}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
         <View style={styles.topBar}>
           <Pressable
             onPress={() => navigation.navigate('Parametres')}
@@ -231,7 +236,7 @@ export default function HomeScreen({ navigation }) {
                 onPress={() => navigation.navigate('Catalog')}
                 accessibilityRole="button"
                 accessibilityLabel={t('home_btn_discover')}
-                accessibilityHint="Ouvre le catalogue des modules du programme."
+                accessibilityHint={t('home_btn_discover_hint')}
               >
                 <Text style={styles.buttonText}>{t('home_btn_discover')}</Text>
                 <ArrowIcon color={isHighContrast ? colors.accentText : '#164f30'} size={16} />
@@ -262,6 +267,7 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.footer}>{t('home_footer')}</Text>
           </View>
         </View>
+        </ScrollView>
       </SafeAreaView>
     </View>
   );
@@ -271,7 +277,8 @@ function getStyles(colors) {
   const isHighContrast = colors.background === '#000000';
   return StyleSheet.create({
     root: { flex: 1, backgroundColor: colors.background },
-    safe: { flex: 1, justifyContent: 'space-between' },
+    safe: { flex: 1 },
+    defilement: { flexGrow: 1, justifyContent: 'space-between' },
     topBar: { flexDirection: 'row', justifyContent: 'flex-end', paddingHorizontal: 20, paddingTop: 4 },
     contrastButton: {
       width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.15)',

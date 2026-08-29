@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import ScreenHeader from '../components/ScreenHeader';
 import UiIcon from '../components/icons/UiIcon';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function AccessibilityScreen({ navigation }) {
   const {
@@ -9,43 +10,44 @@ export default function AccessibilityScreen({ navigation }) {
     fontScale, fontScaleMin, fontScaleMax,
     increaseFontScale, decreaseFontScale, resetFontScale, rf,isSimplifiedMode, toggleSimplifiedMode,
   } = useTheme();
+  const { t } = useLanguage();
 
   const styles = getStyles(colors);
   const percentage = Math.round(fontScale * 100);
 
   return (
     <View style={styles.container}>
-      <ScreenHeader title="Accessibilité" subtitle="Adaptez l'affichage à vos besoins" onBack={() => navigation.goBack()} />
+      <ScreenHeader title={t('access_title')} subtitle={t('access_subtitle')} onBack={() => navigation.goBack()} />
       <ScrollView contentContainerStyle={styles.content}>
 
         <View style={styles.card}>
-          <Text style={[styles.cardTitle, { fontSize: rf(16) }]}>Contraste élevé</Text>
+          <Text style={[styles.cardTitle, { fontSize: rf(16) }]}>{t('access_contrast')}</Text>
           <Text style={[styles.cardDescription, { fontSize: rf(14) }]}>
-            Fond noir et texte en couleurs vives, pour une meilleure lisibilité.
+            {t('access_contrast_desc')}
           </Text>
           <Pressable
             style={[styles.toggleRow, styles.toggleRowIconed, { backgroundColor: isHighContrast ? colors.accent : colors.surfaceAlt }]}
             onPress={toggleContrast}
             accessibilityRole="switch"
             accessibilityState={{ checked: isHighContrast }}
-            accessibilityLabel="Contraste élevé"
+            accessibilityLabel={t('access_contrast')}
           >
             <UiIcon name={isHighContrast ? 'sun' : 'moon'} size={18} color={isHighContrast ? colors.accentText : colors.textPrimary} />
             <Text style={[styles.toggleText, { color: isHighContrast ? colors.accentText : colors.textPrimary, fontSize: rf(15) }]}>
-              {isHighContrast ? 'Désactiver le contraste élevé' : 'Activer le contraste élevé'}
+              {isHighContrast ? t('access_contrast_on') : t('access_contrast_off')}
             </Text>
           </Pressable>
         </View>
 
         <View style={styles.card}>
-          <Text style={[styles.cardTitle, { fontSize: rf(16) }]}>Taille du texte</Text>
+          <Text style={[styles.cardTitle, { fontSize: rf(16) }]}>{t('access_fontsize')}</Text>
           <Text style={[styles.cardDescription, { fontSize: rf(14) }]}>
-            Agrandissez le texte jusqu'au double de sa taille normale.
+            {t('access_fontsize_desc')}
           </Text>
 
           <View style={styles.previewBox}>
             <Text style={[styles.previewText, { fontSize: rf(16) }]}>
-              Aperçu : voici à quoi ressemblera le texte des modules.
+              {t('access_preview')}
             </Text>
           </View>
 
@@ -55,7 +57,7 @@ export default function AccessibilityScreen({ navigation }) {
               onPress={decreaseFontScale}
               disabled={fontScale <= fontScaleMin}
               accessibilityRole="button"
-              accessibilityLabel="Réduire la taille du texte"
+              accessibilityLabel={t('access_font_smaller')}
               accessibilityState={{ disabled: fontScale <= fontScaleMin }}
             >
               <Text style={styles.stepperButtonText}>A−</Text>
@@ -70,7 +72,7 @@ export default function AccessibilityScreen({ navigation }) {
               onPress={increaseFontScale}
               disabled={fontScale >= fontScaleMax}
               accessibilityRole="button"
-              accessibilityLabel="Augmenter la taille du texte"
+              accessibilityLabel={t('access_font_bigger')}
               accessibilityState={{ disabled: fontScale >= fontScaleMax }}
             >
               <Text style={styles.stepperButtonText}>A+</Text>
@@ -82,15 +84,15 @@ export default function AccessibilityScreen({ navigation }) {
               style={styles.resetButton}
               onPress={resetFontScale}
               accessibilityRole="button"
-              accessibilityLabel="Réinitialiser la taille du texte"
+              accessibilityLabel={t('access_font_reset_a11y')}
             >
-              <Text style={[styles.resetButtonText, { fontSize: rf(13) }]}>Réinitialiser la taille</Text>
+              <Text style={[styles.resetButtonText, { fontSize: rf(13) }]}>{t('access_font_reset')}</Text>
             </Pressable>
           )}
         </View>
 
         <View style={styles.card}>
-          <Text style={[styles.cardTitle, { fontSize: rf(16) }]}>Mode lecture simplifiée</Text>
+          <Text style={[styles.cardTitle, { fontSize: rf(16) }]}>{t('access_simplified')}</Text>
           <Text style={[styles.cardDescription, { fontSize: rf(14) }]}>
             Affiche les modules en phrases courtes avec de grands pictogrammes,
             plus facile à suivre.
@@ -100,11 +102,11 @@ export default function AccessibilityScreen({ navigation }) {
             onPress={toggleSimplifiedMode}
             accessibilityRole="switch"
             accessibilityState={{ checked: isSimplifiedMode }}
-            accessibilityLabel="Mode lecture simplifiée"
+            accessibilityLabel={t('access_simplified')}
           >
             <UiIcon name={isSimplifiedMode ? 'checkFilled' : 'image'} size={18} color={isSimplifiedMode ? colors.accentText : colors.textPrimary} />
             <Text style={[styles.toggleText, { color: isSimplifiedMode ? colors.accentText : colors.textPrimary, fontSize: rf(15) }]}>
-              {isSimplifiedMode ? 'Mode simplifié activé' : 'Activer le mode simplifié'}
+              {isSimplifiedMode ? t('access_simplified_on') : t('access_simplified_off')}
             </Text>
           </Pressable>
         </View>
