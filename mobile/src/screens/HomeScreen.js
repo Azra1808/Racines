@@ -3,17 +3,18 @@ import { View, Text, StyleSheet, Pressable, Animated, Dimensions } from 'react-n
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const { width } = Dimensions.get('window');
 
-const FEATURES = [
-  { icon: '📶', label: 'Hors connexion' },
-  { icon: '🔊', label: 'Lecture audio' },
-  { icon: '📚', label: '8 modules' },
-];
-
 export default function HomeScreen({ navigation }) {
   const { colors } = useTheme();
+  const { t } = useLanguage();
+  const FEATURES = [
+    { icon: '📶', label: t('home_feature_offline') },
+    { icon: '🔊', label: t('home_feature_audio') },
+    { icon: '📚', label: t('home_feature_modules') },
+  ];
   const badgeAnim = useRef(new Animated.Value(0)).current;
   const titleAnim = useRef(new Animated.Value(24)).current;
   const titleFade = useRef(new Animated.Value(0)).current;
@@ -51,12 +52,12 @@ export default function HomeScreen({ navigation }) {
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <View style={styles.topBar}>
           <Pressable
-            onPress={() => navigation.navigate('Accessibility')}
+            onPress={() => navigation.navigate('Parametres')}
             style={styles.contrastButton}
             accessibilityRole="button"
-            accessibilityLabel="Ouvrir les réglages d'accessibilité"
+            accessibilityLabel={t('nav_settings')}
           >
-            <Text style={styles.contrastIcon}>♿</Text>
+            <Text style={styles.contrastIcon}>⚙️</Text>
           </Pressable>
         </View>
 
@@ -66,12 +67,9 @@ export default function HomeScreen({ navigation }) {
           </Animated.View>
 
           <Animated.View style={{ opacity: titleFade, transform: [{ translateY: titleAnim }] }}>
-            <Text style={styles.eyebrow}>Programme de parentalité positive</Text>
+            <Text style={styles.eyebrow}>{t('home_eyebrow')}</Text>
             <Text style={styles.title}>RACINES</Text>
-            <Text style={styles.subtitle}>
-              Des conseils simples et fiables pour accompagner votre enfant,
-              à chaque étape de sa vie.
-            </Text>
+            <Text style={styles.subtitle}>{t('home_subtitle')}</Text>
           </Animated.View>
         </View>
 
@@ -90,10 +88,10 @@ export default function HomeScreen({ navigation }) {
               style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
               onPress={() => navigation.navigate('Catalog')}
               accessibilityRole="button"
-              accessibilityLabel="Découvrir les huit modules"
+              accessibilityLabel={t('home_btn_discover')}
               accessibilityHint="Ouvre le catalogue des modules du programme."
             >
-              <Text style={styles.buttonText}>Découvrir les modules</Text>
+              <Text style={styles.buttonText}>{t('home_btn_discover')}</Text>
               <Text style={styles.buttonText}>→</Text>
             </Pressable>
 
@@ -104,21 +102,21 @@ export default function HomeScreen({ navigation }) {
               accessibilityLabel="Parler à Lulu"
               accessibilityHint="Ouvre l'assistant d'orientation vers les modules."
             >
-              <Text style={styles.secondaryButtonText}>💬 Parler à Lulu</Text>
+              <Text style={styles.secondaryButtonText}>💬 {t('home_btn_lulu')}</Text>
             </Pressable>
 
             <Pressable
               style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
               onPress={() => navigation.navigate('Channels')}
               accessibilityRole="button"
-              accessibilityLabel="Voir les cinq canaux"
-              accessibilityHint="Montre le même contenu rendu pour l'application, le SMS, l'USSD, le vocal et la lecture simplifiée."
+              accessibilityLabel={t('home_btn_channels')}
+              accessibilityHint={t('home_btn_channels_hint')}
             >
-              <Text style={styles.secondaryButtonText}>📵 Sans internet — 5 canaux</Text>
+              <Text style={styles.secondaryButtonText}>📵 {t('home_btn_channels')}</Text>
             </Pressable>
           </Animated.View>
 
-          <Text style={styles.footer}>Contenus issus du guide officiel UNICEF Cameroun</Text>
+          <Text style={styles.footer}>{t('home_footer')}</Text>
         </View>
       </SafeAreaView>
     </View>

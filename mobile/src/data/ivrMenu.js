@@ -33,6 +33,15 @@ const ACCUEIL =
   "Pour être rappelé par un facilitateur, tapez 3.";
 
 const MENU_THEMES_INTRO = 'Choisissez un thème. ';
+
+// Un menu vocal ne peut pas énumérer dix thèmes : au-delà de quatre, le
+// parent a oublié le premier avant la fin de l'annonce. On en annonce
+// quatre, et on n'accepte que ceux-là.
+const NB_THEMES_ANNONCES = 4;
+
+function themesAnnonces() {
+  return MODULES.slice(0, NB_THEMES_ANNONCES);
+}
 const RAPPEL_FACILITATEUR =
   "Votre demande est enregistrée. Un facilitateur de votre communauté vous " +
   "rappellera. Si la situation est urgente, rendez-vous au centre de santé le " +
@@ -75,17 +84,20 @@ export function resoudreEtapeIvr(etapes) {
     if (!theme) {
       // Un menu vocal ne s'écoute pas comme une liste écrite : on annonce
       // les thèmes un par un, numérotés, comme le ferait un vrai serveur.
-      const annonce = MODULES.slice(0, 4)
+      const annonce = themesAnnonces()
         .map((unite, i) => `Pour ${unite.thematique}, tapez ${i + 1}.`)
         .join(' ');
       return {
         texte: `${MENU_THEMES_INTRO}${annonce}`,
         enCours: true,
-        aide: '1 à 4   —   0 pour réécouter',
+        aide: `1 à ${themesAnnonces().length}   —   0 pour réécouter`,
       };
     }
 
-    const unite = MODULES[Number(theme) - 1];
+    // On n'accepte que ce qui a été annoncé à voix haute. Sans cette borne,
+    // l'ajout de modules au corpus rendrait accessibles des touches dont le
+    // parent n'a jamais entendu parler.
+    const unite = themesAnnonces()[Number(theme) - 1];
     if (!unite) {
       return {
         texte: `Ce choix n'existe pas. ${AU_REVOIR}`,

@@ -6,6 +6,7 @@ import ModuleScreen from '../screens/ModuleScreen';
 import QuizScreen from '../screens/QuizScreen';
 import LuluScreen from '../screens/LuluScreen';
 import AccessibilityScreen from '../screens/AccessibilityScreen';
+import ParametresScreen from '../screens/ParametresScreen';
 import UssdScreen from '../screens/UssdScreen';
 import IvrScreen from '../screens/IvrScreen';
 import ChannelsScreen from '../screens/ChannelsScreen';
@@ -22,6 +23,7 @@ export default function AppNavigator() {
         <Stack.Screen name="Quiz" component={QuizScreen} />
         <Stack.Screen name="Lulu" component={LuluScreen} />
         <Stack.Screen name="Accessibility" component={AccessibilityScreen} />
+        <Stack.Screen name="Parametres" component={ParametresScreen} />
         <Stack.Screen name="Ussd" component={UssdScreen} />
         <Stack.Screen name="Ivr" component={IvrScreen} />
         <Stack.Screen name="Channels" component={ChannelsScreen} />

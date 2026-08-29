@@ -36,7 +36,7 @@ export default function ScreenHeader({ title, subtitle, onBack }) {
             accessibilityRole="button"
             accessibilityLabel="Ouvrir les réglages d'accessibilité"
           >
-            <Text style={styles.accessIcon}>♿</Text>
+            <Text style={styles.accessIcon}>⚙️</Text>
           </Pressable>
         </View>
       </SafeAreaView>

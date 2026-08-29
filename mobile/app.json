@@ -6,7 +6,7 @@
     "description": "Des conseils parentaux simples, fiables et accessibles hors connexion.",
     "scheme": "racines",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/IconOfficielle.jpeg",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true

@@ -45,6 +45,24 @@ describe('serveur vocal IVR', () => {
     expect(resoudreEtapeIvr(['2', '9']).texte).toContain("n'existe pas");
   });
 
+  // Défaut constaté le 29/08 à l'arrivée des modules U09/U10 : le menu
+  // annonçait 4 thèmes mais acceptait les touches jusqu'à 10. Un parent
+  // tapant « 9 » recevait un module dont il n'avait jamais entendu parler.
+  it('n\'accepte que les thèmes réellement annoncés à voix haute', () => {
+    const annonce = resoudreEtapeIvr(['2']).texte;
+    const annonces = [...annonce.matchAll(/tapez (\d)\./g)].map((m) => m[1]);
+    expect(annonces.length).toBeGreaterThan(0);
+
+    // Tout ce qui est annoncé doit répondre…
+    for (const touche of annonces) {
+      expect(resoudreEtapeIvr(['2', touche]).texte).not.toContain("n'existe pas");
+    }
+    // …et tout le reste doit être refusé, quel que soit le nombre de modules.
+    for (let n = annonces.length + 1; n <= MODULES.length + 1; n += 1) {
+      expect(resoudreEtapeIvr(['2', String(n)]).texte).toContain("n'existe pas");
+    }
+  });
+
   it('ne déclare disponible que le français, les langues locales restant à enregistrer', () => {
     const disponibles = LANGUES.filter((l) => l.disponible).map((l) => l.nom);
     expect(disponibles).toEqual(['Français']);
