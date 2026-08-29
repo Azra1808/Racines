@@ -10,6 +10,7 @@ import ParametresScreen from '../screens/ParametresScreen';
 import UssdScreen from '../screens/UssdScreen';
 import IvrScreen from '../screens/IvrScreen';
 import ChannelsScreen from '../screens/ChannelsScreen';
+import SmsScreen from '../screens/SmsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -27,6 +28,7 @@ export default function AppNavigator() {
         <Stack.Screen name="Ussd" component={UssdScreen} />
         <Stack.Screen name="Ivr" component={IvrScreen} />
         <Stack.Screen name="Channels" component={ChannelsScreen} />
+        <Stack.Screen name="Sms" component={SmsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

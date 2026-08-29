@@ -140,6 +140,7 @@ function construireRendus(unite) {
       icone: '💬',
       mesure: `${unite.resumeSms.length}/${LIMITE_SMS}`,
       texte: unite.resumeSms,
+      action: { route: 'Sms', libelle: 'Envoyer un conseil par SMS' },
     },
     {
       canal: 'USSD',
