@@ -32,6 +32,21 @@ function tronquer(texte, limite = LIMITE_CARACTERES_USSD) {
   return `${texte.slice(0, limite - 1).trimEnd()}…`;
 }
 
+/**
+ * Compose l'écran de détail d'un module.
+ *
+ * Le titre est un confort, le conseil est l'essentiel : si les deux ne
+ * tiennent pas dans les 182 caractères, on sacrifie le titre — jamais le
+ * conseil. Un parent qui vient de choisir « 3 » dans la liste sait déjà quel
+ * module il a demandé ; en revanche une phrase coupée au milieu lui fait
+ * perdre l'information utile.
+ */
+function ecranDetailModule(unite) {
+  const avecTitre = `${unite.titre}\n${unite.resumeSms}`;
+  if (avecTitre.length <= LIMITE_CARACTERES_USSD) return avecTitre;
+  return unite.resumeSms;
+}
+
 const MENU_RACINE =
   'RACINES - Parentalite positive\n' +
   '1. Conseil du jour\n' +
@@ -139,10 +154,7 @@ function resoudreCatalogue(suite) {
     if (!unite) {
       return { type: 'END', texte: `Option invalide. Rappelez ${CODE_COURT}` };
     }
-    return {
-      type: 'END',
-      texte: tronquer(`${unite.titre}\n${unite.resumeSms}`),
-    };
+    return { type: 'END', texte: ecranDetailModule(unite) };
   }
 
   const debut = page * TAILLE_PAGE;

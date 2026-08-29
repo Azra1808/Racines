@@ -64,6 +64,34 @@ describe('menu USSD', () => {
     }
   });
 
+  // Défaut constaté le 29/08 sur l'écran « cinq portes » : 4 modules sur 8
+  // affichaient un conseil coupé par « … », parce que titre + résumé
+  // dépassaient 182 caractères. Un parent perdait la fin de l'information.
+  it('n\'ampute jamais le conseil, quel que soit le module choisi', () => {
+    for (let position = 0; position < MODULES.length; position += 1) {
+      const page = Math.floor(position / 4);
+      const rang = String((position % 4) + 1);
+      const etapes = ['2', ...Array(page).fill('5'), rang];
+
+      const { texte } = resoudreEcranUssd(etapes);
+      const affiche = sansAccents(texte);
+
+      expect(affiche.length).toBeLessThanOrEqual(LIMITE_CARACTERES_USSD);
+      expect(affiche).not.toContain('…');
+      // Le conseil doit toujours être présent en entier, titre ou pas.
+      expect(affiche).toContain(sansAccents(MODULES[position].resumeSms));
+    }
+  });
+
+  it('garde chaque résumé SMS sous la limite d\'un écran USSD', () => {
+    // Invariant du modèle de contenu : un resumeSms tient dans un SMS (160)
+    // donc a fortiori dans un écran USSD (182). Si un jour ce test casse,
+    // c'est le contenu qui a dérivé, pas le canal.
+    for (const unite of MODULES) {
+      expect(sansAccents(unite.resumeSms).length).toBeLessThanOrEqual(LIMITE_CARACTERES_USSD);
+    }
+  });
+
   it('retire les accents, que les combinés basiques affichent mal', () => {
     expect(sansAccents('éàçûî')).toBe('eacui');
   });
