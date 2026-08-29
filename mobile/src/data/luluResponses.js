@@ -116,6 +116,16 @@ export const LULU_RULES = [
     moduleId: 'u08-accompagner-adolescent',
     reponse: 'L\'adolescence est une période délicate à accompagner. Ce module peut vous aider :',
   },
+  {
+    keywords: ['budget', 'depense', 'depenses', 'economiser', 'scolarite', 'frais', 'revenu'],
+    moduleId: 'u09-planifier-budget-enfant',
+    reponse: 'Prévoir les dépenses de ses enfants, cela s\'organise en famille. Ce module vous guide :',
+  },
+  {
+    keywords: ['fatigue', 'fatiguee', 'stress', 'repos', 'souffler', 'epuise', 'epuisee', 'prendre soin de moi'],
+    moduleId: 'u10-prendre-soin-de-soi',
+    reponse: 'Prendre soin de vous, c\'est aussi prendre soin de votre enfant. Ce module en parle :',
+  },
 ];
 
 export const LULU_FALLBACK =

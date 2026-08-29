@@ -1,4 +1,5 @@
-import { trouverReponse } from './luluResponses';
+import { trouverReponse, LULU_RULES } from './luluResponses';
+import { MODULES } from './modules';
 
 // Les 10 formulations de détresse rédigées en T-014 (Sprint 0) et chargées
 // dans la table `formulations_test`. Ce sont les phrases telles qu'un parent
@@ -68,6 +69,22 @@ describe('garde-fous de Lulu Parent', () => {
       expect(reponse?.type).not.toBe('urgence');
     }
   );
+
+  // Constaté le 29/08 : les modules U09 et U10, ajoutés au corpus, n'avaient
+  // aucune règle. Un parent posant une question sur le budget ou la fatigue
+  // recevait « je n'ai pas de réponse » alors que le module existait.
+  it('sait orienter vers chacun des modules du corpus', () => {
+    const cibles = new Set(LULU_RULES.map((r) => r.moduleId));
+    const orphelins = MODULES.filter((m) => !cibles.has(m.id)).map((m) => m.titre);
+    expect(orphelins).toEqual([]);
+  });
+
+  it('ne référence aucun module qui n\'existe plus', () => {
+    const idsReels = new Set(MODULES.map((m) => m.id));
+    for (const regle of LULU_RULES) {
+      expect(idsReels.has(regle.moduleId)).toBe(true);
+    }
+  });
 
   it('ne dépend pas des accents ni des apostrophes', () => {
     for (const variante of [
