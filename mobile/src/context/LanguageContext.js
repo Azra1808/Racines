@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useMemo } from 'react';
+import { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import { lirePreferences, enregistrerPreference } from '../data/db';
 
 // IMPORTANT — à lire avant d'enregistrer la vidéo de démonstration :
 // Le français et l'anglais ci-dessous sont fiables. L'ewondo et le bassa
@@ -14,14 +15,17 @@ import { createContext, useContext, useState, useMemo } from 'react';
 
 // « code » remplace l'ancien drapeau emoji : un badge texte à deux ou trois
 // lettres, rendu par un composant SVG (voir ParametresScreen).
+// `complete: false` = traduction de meilleur effort, non validée par un
+// locuteur natif. L'écran des paramètres l'affiche : mieux vaut le dire que
+// laisser un parent croire à une traduction relue (cf. plan §8.5).
 export const LANGUES = [
-  { id: 'fr', label: 'Français', code: 'FR' },
-  { id: 'en', label: 'English', code: 'EN' },
-  { id: 'ewo', label: 'Ewondo', code: 'EW' },
-  { id: 'bas', label: 'Bassa', code: 'BA' },
+  { id: 'fr', label: 'Français', code: 'FR', complete: true },
+  { id: 'en', label: 'English', code: 'EN', complete: true },
+  { id: 'ewo', label: 'Ewondo', code: 'EW', complete: false },
+  { id: 'bas', label: 'Bassa', code: 'BA', complete: false },
 ];
 
-const TRADUCTIONS = {
+export const TRADUCTIONS = {
   fr: {
     home_eyebrow: 'Programme de parentalité positive',
     home_subtitle: 'Des conseils simples et fiables pour accompagner votre enfant, à chaque étape de sa vie.',
@@ -43,13 +47,149 @@ const TRADUCTIONS = {
     settings_theme_subtitle: 'Choisissez les couleurs de l\'application',
     settings_language_title: 'Langue',
     settings_language_subtitle: 'Choisissez la langue de l\'interface',
-    settings_accessibility_link: 'Réglages d\'accessibilité →',
+    settings_accessibility_link: 'Réglages d\'accessibilité',
     lulu_greeting: 'Bonjour, je suis Lulu. Posez-moi une question sur votre enfant, je vous orienterai vers le bon module.',
     lulu_placeholder: 'Écrivez votre question...',
     lulu_source: 'Source',
     common_open_module: 'Ouvrir le module',
     common_next: 'Suivant',
     common_listen: 'Écouter',
+    a11y_back: "Revenir à l'écran précédent",
+    a11y_open_accessibility: "Ouvrir les réglages d'accessibilité",
+    catalog_title: "Les modules",
+    catalog_hint: "Ouvre le module et ses sous-parties.",
+    module_not_found: "Module introuvable",
+    module_read: "Module lu",
+    module_parts_title: "Les {n} parties du module",
+    module_part_hint: "Ouvre les cinq questions de cette partie.",
+    module_audio_progress: "Progression de la lecture audio",
+    module_audio_hint: "La lecture dépend de la voix française disponible sur le téléphone.",
+    submodule_not_found: "Partie introuvable",
+    submodule_start: "Commencer les {n} questions",
+    quiz_title: "Quiz",
+    quiz_result: "Résultat",
+    quiz_coming_soon: "Ce quiz arrive bientôt.",
+    quiz_bilan_cta: "Faire le bilan du module ({n} questions)",
+    quiz_bilan_a11y: "Faire le bilan du module, {n} questions",
+    quiz_next_part: "Partie suivante",
+    quiz_next_part_a11y: "Passer à la partie suivante",
+    quiz_back_module: "Retour au module",
+    quiz_back_module_a11y: "Revenir au module",
+    lulu_title: "Lulu Parent",
+    lulu_subtitle: "Votre assistant RACINES",
+    lulu_input_a11y: "Votre question à Lulu",
+    lulu_input_hint: "Écrivez une question sur votre enfant puis envoyez-la.",
+    lulu_send_a11y: "Envoyer la question à Lulu",
+    lulu_send_hint: "Lulu vous orientera vers un module approprié ou vers une aide urgente si nécessaire.",
+    channels_title: "Un contenu, cinq portes",
+    channels_subtitle: "Le même module, rendu pour chaque canal",
+    ussd_title: "Canal USSD",
+    ussd_subtitle: "Parcours sur téléphone basique",
+    ussd_answer: "Reponse :",
+    ussd_clear: "Effacer",
+    ussd_clear_a11y: "Effacer le dernier caractère",
+    ussd_call: "Appeler",
+    ussd_hangup: "Raccrocher",
+    ussd_hangup_a11y: "Raccrocher et recommencer",
+    ussd_send: "Envoyer",
+    ussd_send_a11y: "Envoyer la réponse",
+    ivr_title: "Canal vocal (IVR)",
+    ivr_subtitle: "Pour les parents qui n'écrivent pas",
+    ivr_press_call: "Appuyez sur Appeler",
+    ivr_call: "Appeler",
+    ivr_hangup: "Raccrocher",
+    ivr_languages_title: "Langues du canal vocal",
+    sms_title: "Canal SMS",
+    sms_subtitle: "Le conseil, envoyé depuis votre téléphone",
+    sms_send_cta: "Envoyer ce conseil par SMS",
+    sms_send_hint: "Ouvre la messagerie du téléphone avec le conseil déjà écrit.",
+    sms_available_today: "Disponible aujourd'hui :",
+    sms_incubation: "Phase d'incubation :",
+    access_title: "Accessibilité",
+    access_subtitle: "Adaptez l'affichage à vos besoins",
+    access_contrast: "Contraste élevé",
+    access_contrast_desc: "Fond noir et texte en couleurs vives, pour une meilleure lisibilité.",
+    access_fontsize: "Taille du texte",
+    access_fontsize_desc: "Agrandissez le texte jusqu'au double de sa taille normale.",
+    access_preview: "Aperçu : voici à quoi ressemblera le texte des modules.",
+    access_font_reset: "Réinitialiser la taille",
+    access_font_reset_a11y: "Réinitialiser la taille du texte",
+    access_font_smaller: "Réduire la taille du texte",
+    access_font_bigger: "Augmenter la taille du texte",
+    access_simplified: "Mode lecture simplifiée",
+    splash_slogan: "Grandir avec amour, dès les premières racines.",
+    home_btn_discover_hint: "Ouvre le catalogue des modules du programme.",
+    lang_partial_notice: "Traduction partielle : les textes non traduits restent en français, en attente de validation par un locuteur natif.",
+    catalog_subtitle: "{n} thématiques du programme officiel",
+    catalog_card_meta: "{parties} parties · {questions} questions",
+    catalog_state_done: "bilan terminé",
+    catalog_state_started: "en cours",
+    access_contrast_on: "Désactiver le contraste élevé",
+    access_contrast_off: "Activer le contraste élevé",
+    access_simplified_on: "Mode simplifié activé",
+    access_simplified_off: "Activer le mode simplifié",
+    channel_app: "Application",
+    channel_sms: "SMS",
+    channel_ussd: "USSD",
+    channel_ivr: "Vocal (IVR)",
+    channel_simplified: "Lecture simplifiée",
+    channel_open_module: "Lire le module complet",
+    channel_open_sms: "Envoyer un conseil par SMS",
+    channel_open_ussd: "Ouvrir le simulateur USSD",
+    channel_open_ivr: "Écouter le parcours vocal",
+    channels_intro_1: "Le contenu est écrit",
+    channels_intro_strong: "une seule fois",
+    channels_intro_2: ". Chaque canal en sélectionne les champs dont il a besoin. Changez de module : les cinq rendus ci-dessous changent ensemble. Touchez un encadré pour ouvrir le canal correspondant.",
+    channels_conclusion: "Ajouter un canal, c'est écrire un adaptateur. Ajouter une langue, c'est traduire les mêmes champs. Ni l'un ni l'autre ne demande de réécrire les modules — c'est ce qui rend l'extension nationale soutenable.",
+    module_select: "Module {n} : {titre}",
+    ivr_server_speaking: "Le serveur parle…",
+    ivr_waiting: "En attente de votre choix",
+    ivr_call_ended: "Appel terminé",
+    ivr_available: "Disponible",
+    ivr_key: "Touche {touche}",
+    ivr_call_number: "Appeler le {numero}",
+    ivr_ready_to_call: "Prêt à appeler le {numero}",
+    ivr_server_says: "Le serveur dit : {texte}",
+    ivr_lang_coming: "{langue}, à venir : {note}",
+    ussd_dial: "Composez {code}",
+    ussd_key: "Touche {touche}",
+    ussd_call_code: "Appeler le code {code}",
+    ussd_session_over: "— Session terminee —",
+    ussd_screen_a11y: "Écran USSD : {texte}",
+    ussd_dialer_a11y: "Clavier de composition. Numéro composé : {compose}",
+    ussd_con_hint: "CON : la session reste ouverte, le parent peut répondre.",
+    ussd_end_hint: "END : la session se ferme, comme sur un vrai réseau.",
+    module_audio_playing: "Lecture en cours",
+    module_audio_stopped: "Lecture arrêtée",
+    module_listen: "Écouter le module",
+    module_stop: "Arrêter la lecture",
+    module_stop_a11y: "Arrêter la lecture audio",
+    module_bilan: "Bilan du module",
+    module_bilan_redo: "Refaire le bilan du module",
+    module_bilan_desc: "{n} questions pour valider tout ce que vous avez appris",
+    module_bilan_locked: "Terminez les {n} parties pour débloquer le bilan",
+    module_bilan_locked_a11y: "Bilan verrouillé : terminez les {n} parties pour le débloquer",
+    module_part_label: "Partie {n} : {titre}",
+    module_part_done: "Partie {n} : {titre}, terminée",
+    quiz_bilan_done: "Bilan terminé !",
+    quiz_part_done: "Partie {n} terminée !",
+    quiz_answer_locked: "La réponse a déjà été validée.",
+    quiz_answer_hint: "Double-tapez pour choisir cette réponse.",
+    quiz_next_q_a11y: "Passer à la question suivante",
+    quiz_show_result_a11y: "Afficher le résultat du quiz",
+    quiz_next_question: "Question suivante",
+    quiz_see_result: "Voir le résultat",
+    quiz_progress: "Question {n} / {total}",
+    quiz_answer_label: "Réponse {n} : {option}",
+    quiz_bilan_header: "Bilan · {titre}",
+    sms_send_a11y: "Envoyer par SMS le conseil du module {titre}",
+    submodule_header: "Partie {n} · {titre}",
+    submodule_answer_a11y: "Répondre aux cinq questions de {titre}",
+    settings_theme_label: "Thème {nom}",
+    theme_nature: "Nature",
+    theme_soleil: "Soleil",
+    theme_ocean: "Océan",
+    theme_contraste: "Contraste élevé",
   },
   en: {
     home_eyebrow: 'Positive parenting programme',
@@ -72,13 +212,149 @@ const TRADUCTIONS = {
     settings_theme_subtitle: 'Choose the app colours',
     settings_language_title: 'Language',
     settings_language_subtitle: 'Choose the interface language',
-    settings_accessibility_link: 'Accessibility settings →',
+    settings_accessibility_link: 'Accessibility settings',
     lulu_greeting: 'Hello, I\'m Lulu. Ask me anything about your child and I\'ll point you to the right module.',
     lulu_placeholder: 'Type your question...',
     lulu_source: 'Source',
     common_open_module: 'Open module',
     common_next: 'Next',
     common_listen: 'Listen',
+    a11y_back: "Go back to the previous screen",
+    a11y_open_accessibility: "Open accessibility settings",
+    catalog_title: "The modules",
+    catalog_hint: "Opens the module and its parts.",
+    module_not_found: "Module not found",
+    module_read: "Module read",
+    module_parts_title: "The {n} parts of this module",
+    module_part_hint: "Opens the five questions of this part.",
+    module_audio_progress: "Audio playback progress",
+    module_audio_hint: "Playback depends on the French voice available on the phone.",
+    submodule_not_found: "Part not found",
+    submodule_start: "Start the {n} questions",
+    quiz_title: "Quiz",
+    quiz_result: "Result",
+    quiz_coming_soon: "This quiz is coming soon.",
+    quiz_bilan_cta: "Take the module review ({n} questions)",
+    quiz_bilan_a11y: "Take the module review, {n} questions",
+    quiz_next_part: "Next part",
+    quiz_next_part_a11y: "Go to the next part",
+    quiz_back_module: "Back to the module",
+    quiz_back_module_a11y: "Go back to the module",
+    lulu_title: "Lulu Parent",
+    lulu_subtitle: "Your RACINES assistant",
+    lulu_input_a11y: "Your question to Lulu",
+    lulu_input_hint: "Write a question about your child, then send it.",
+    lulu_send_a11y: "Send the question to Lulu",
+    lulu_send_hint: "Lulu will point you to a suitable module, or to urgent help if needed.",
+    channels_title: "One content, five doors",
+    channels_subtitle: "The same module, rendered for each channel",
+    ussd_title: "USSD channel",
+    ussd_subtitle: "Journey on a basic phone",
+    ussd_answer: "Reply:",
+    ussd_clear: "Clear",
+    ussd_clear_a11y: "Clear the last character",
+    ussd_call: "Call",
+    ussd_hangup: "Hang up",
+    ussd_hangup_a11y: "Hang up and start over",
+    ussd_send: "Send",
+    ussd_send_a11y: "Send the reply",
+    ivr_title: "Voice channel (IVR)",
+    ivr_subtitle: "For parents who do not write",
+    ivr_press_call: "Press Call",
+    ivr_call: "Call",
+    ivr_hangup: "Hang up",
+    ivr_languages_title: "Voice channel languages",
+    sms_title: "SMS channel",
+    sms_subtitle: "The advice, sent from your own phone",
+    sms_send_cta: "Send this advice by SMS",
+    sms_send_hint: "Opens the phone messaging app with the advice already written.",
+    sms_available_today: "Available today:",
+    sms_incubation: "Incubation phase:",
+    access_title: "Accessibility",
+    access_subtitle: "Adjust the display to your needs",
+    access_contrast: "High contrast",
+    access_contrast_desc: "Black background and bright text, for better readability.",
+    access_fontsize: "Text size",
+    access_fontsize_desc: "Enlarge the text up to twice its normal size.",
+    access_preview: "Preview: this is how module text will look.",
+    access_font_reset: "Reset the size",
+    access_font_reset_a11y: "Reset the text size",
+    access_font_smaller: "Decrease the text size",
+    access_font_bigger: "Increase the text size",
+    access_simplified: "Simplified reading mode",
+    splash_slogan: "Growing with love, from the very first roots.",
+    home_btn_discover_hint: "Opens the catalogue of programme modules.",
+    lang_partial_notice: "Partial translation: untranslated text stays in French, pending validation by a native speaker.",
+    catalog_subtitle: "{n} themes from the official programme",
+    catalog_card_meta: "{parties} parts · {questions} questions",
+    catalog_state_done: "review completed",
+    catalog_state_started: "in progress",
+    access_contrast_on: "Turn off high contrast",
+    access_contrast_off: "Turn on high contrast",
+    access_simplified_on: "Simplified mode on",
+    access_simplified_off: "Turn on simplified mode",
+    channel_app: "App",
+    channel_sms: "SMS",
+    channel_ussd: "USSD",
+    channel_ivr: "Voice (IVR)",
+    channel_simplified: "Simplified reading",
+    channel_open_module: "Read the full module",
+    channel_open_sms: "Send advice by SMS",
+    channel_open_ussd: "Open the USSD simulator",
+    channel_open_ivr: "Listen to the voice journey",
+    channels_intro_1: "The content is written",
+    channels_intro_strong: "only once",
+    channels_intro_2: ". Each channel picks the fields it needs. Switch module: the five renderings below change together. Tap a card to open that channel.",
+    channels_conclusion: "Adding a channel means writing an adapter. Adding a language means translating the same fields. Neither requires rewriting the modules — that is what makes national rollout sustainable.",
+    module_select: "Module {n}: {titre}",
+    ivr_server_speaking: "The server is speaking…",
+    ivr_waiting: "Waiting for your choice",
+    ivr_call_ended: "Call ended",
+    ivr_available: "Available",
+    ivr_key: "Key {touche}",
+    ivr_call_number: "Call {numero}",
+    ivr_ready_to_call: "Ready to call {numero}",
+    ivr_server_says: "The server says: {texte}",
+    ivr_lang_coming: "{langue}, coming: {note}",
+    ussd_dial: "Dial {code}",
+    ussd_key: "Key {touche}",
+    ussd_call_code: "Call the code {code}",
+    ussd_session_over: "— Session ended —",
+    ussd_screen_a11y: "USSD screen: {texte}",
+    ussd_dialer_a11y: "Dial pad. Number dialled: {compose}",
+    ussd_con_hint: "CON: the session stays open, the parent can reply.",
+    ussd_end_hint: "END: the session closes, as on a real network.",
+    module_audio_playing: "Playing",
+    module_audio_stopped: "Stopped",
+    module_listen: "Listen to the module",
+    module_stop: "Stop playback",
+    module_stop_a11y: "Stop the audio playback",
+    module_bilan: "Module review",
+    module_bilan_redo: "Retake the module review",
+    module_bilan_desc: "{n} questions to confirm everything you have learned",
+    module_bilan_locked: "Finish the {n} parts to unlock the review",
+    module_bilan_locked_a11y: "Review locked: finish the {n} parts to unlock it",
+    module_part_label: "Part {n}: {titre}",
+    module_part_done: "Part {n}: {titre}, completed",
+    quiz_bilan_done: "Review completed!",
+    quiz_part_done: "Part {n} completed!",
+    quiz_answer_locked: "The answer has already been submitted.",
+    quiz_answer_hint: "Double-tap to choose this answer.",
+    quiz_next_q_a11y: "Go to the next question",
+    quiz_show_result_a11y: "Show the quiz result",
+    quiz_next_question: "Next question",
+    quiz_see_result: "See the result",
+    quiz_progress: "Question {n} / {total}",
+    quiz_answer_label: "Answer {n}: {option}",
+    quiz_bilan_header: "Review · {titre}",
+    sms_send_a11y: "Send by SMS the advice from module {titre}",
+    submodule_header: "Part {n} · {titre}",
+    submodule_answer_a11y: "Answer the five questions of {titre}",
+    settings_theme_label: "Theme {nom}",
+    theme_nature: "Nature",
+    theme_soleil: "Sun",
+    theme_ocean: "Ocean",
+    theme_contraste: "High contrast",
   },
   // Ewondo — traduction de meilleur effort, NON VALIDÉE (voir avertissement
   // en haut de fichier). À faire relire avant diffusion.
@@ -101,13 +377,33 @@ const TRADUCTIONS = {
     settings_theme_subtitle: 'Pô mintaña ma app',
     settings_language_title: 'Ayôñ',
     settings_language_subtitle: 'Pô ayôñ a app',
-    settings_accessibility_link: 'Ngamba asu bôt bese →',
+    settings_accessibility_link: 'Ngamba asu bôt bese',
     lulu_greeting: 'Mbolô, ma ne Lulu. Sili ma jam d\'ayoñ mon wo, ma ye lem wo bikalate.',
     lulu_placeholder: 'Tila jam wo...',
     lulu_source: 'Ayale',
     common_open_module: 'Fulu bikalate',
     common_next: 'Ake',
     common_listen: 'Wôk',
+    // --- Ajouts composés à partir du vocabulaire ci-dessus ------------------
+    // Aucune phrase nouvelle : chaque entrée reprend un mot déjà traduit, un
+    // sigle ou un nom propre. Origine indiquée en fin de ligne. Reste à faire
+    // relire par un locuteur natif, comme le reste de ce bloc.
+    catalog_title: "Bikalate", // de home_feature_modules « Bikalate 10 »
+    a11y_back: "Kal si", // identique à nav_back
+    a11y_open_accessibility: "Ayôñ asu bôt bese", // identique à nav_accessibility
+    channel_open_module: "Fulu bikalate", // identique à common_open_module
+    module_listen: "Wôk bikalate", // common_listen « Wôk » + bikalate, même schéma que « Fulu bikalate »
+    quiz_next_question: "Ake", // identique à common_next
+    quiz_next_part: "Ake", // identique à common_next
+    quiz_back_module: "Kal si", // identique à nav_back
+    settings_theme_label: "Mintaña {nom}", // mintaña, de settings_theme_title
+    home_btn_channels: "Si internet te", // identique à home_feature_offline
+    channel_app: "App", // de settings_theme_subtitle « mintaña ma app »
+    quiz_title: "Quiz", // emprunt, inchangé
+    lulu_title: "Lulu Parent", // nom propre, inchangé
+    channel_sms: "SMS", // sigle, inchangé
+    channel_ussd: "USSD", // sigle, inchangé
+    channel_ivr: "IVR", // sigle, inchangé
   },
   // Bassa — traduction de meilleur effort, NON VALIDÉE (voir avertissement
   // en haut de fichier). À faire relire avant diffusion.
@@ -130,13 +426,33 @@ const TRADUCTIONS = {
     settings_theme_subtitle: 'Pô mintaña ma app',
     settings_language_title: 'Hilongi',
     settings_language_subtitle: 'Pô hilongi i app',
-    settings_accessibility_link: 'Ngiimba asu bôt bese →',
+    settings_accessibility_link: 'Ngiimba asu bôt bese',
     lulu_greeting: 'Mbôlô, mba nde Lulu. Sili mba jam ni mon wo, mba we lem wo bikalati.',
     lulu_placeholder: 'Tila jam wo...',
     lulu_source: 'Nlombô',
     common_open_module: 'Fulu bikalati',
     common_next: 'Ke',
     common_listen: 'Séŋgi',
+    // --- Ajouts composés à partir du vocabulaire ci-dessus ------------------
+    // Aucune phrase nouvelle : chaque entrée reprend un mot déjà traduit, un
+    // sigle ou un nom propre. Origine indiquée en fin de ligne. Reste à faire
+    // relire par un locuteur natif, comme le reste de ce bloc.
+    catalog_title: "Bikalati", // de home_feature_modules « Bikalati 10 »
+    a11y_back: "Kal si", // identique à nav_back
+    a11y_open_accessibility: "Manyaka asu bôt bese", // identique à nav_accessibility
+    channel_open_module: "Fulu bikalati", // identique à common_open_module
+    module_listen: "Séŋgi bikalati", // common_listen « Séŋgi » + bikalati, même schéma que « Fulu bikalati »
+    quiz_next_question: "Ke", // identique à common_next
+    quiz_next_part: "Ke", // identique à common_next
+    quiz_back_module: "Kal si", // identique à nav_back
+    settings_theme_label: "Mintaña {nom}", // mintaña, de settings_theme_title
+    home_btn_channels: "Ndi internet te", // identique à home_feature_offline
+    channel_app: "App", // de settings_theme_subtitle « mintaña ma app »
+    quiz_title: "Quiz", // emprunt, inchangé
+    lulu_title: "Lulu Parent", // nom propre, inchangé
+    channel_sms: "SMS", // sigle, inchangé
+    channel_ussd: "USSD", // sigle, inchangé
+    channel_ivr: "IVR", // sigle, inchangé
   },
 };
 
@@ -145,14 +461,36 @@ const LanguageContext = createContext(null);
 export function LanguageProvider({ children }) {
   const [langueId, setLangueId] = useState('fr');
 
+  // La langue choisie est conservée : la redemander à chaque ouverture
+  // reviendrait à imposer le français par défaut à chaque lancement.
+  useEffect(() => {
+    let annule = false;
+    lirePreferences().then((prefs) => {
+      if (annule) return;
+      if (prefs.langueId && TRADUCTIONS[prefs.langueId]) setLangueId(prefs.langueId);
+    });
+    return () => { annule = true; };
+  }, []);
+
   const value = useMemo(() => {
     const dict = TRADUCTIONS[langueId] || TRADUCTIONS.fr;
-    function t(cle) {
-      return dict[cle] ?? TRADUCTIONS.fr[cle] ?? cle;
+    // `parametres` permet d'insérer des valeurs calculées sans découper la
+    // phrase : t('module_parts_title', { n: 4 }) sur « Les {n} parties ».
+    // Découper une phrase en morceaux à concaténer casse les langues dont
+    // l'ordre des mots diffère du français.
+    function t(cle, parametres) {
+      const modele = dict[cle] ?? TRADUCTIONS.fr[cle] ?? cle;
+      if (!parametres) return modele;
+      return modele.replace(/\{(\w+)\}/g, (trouve, nom) =>
+        parametres[nom] !== undefined ? String(parametres[nom]) : trouve
+      );
     }
     return {
       langueId,
-      setLangue: setLangueId,
+      setLangue: (id) => {
+        setLangueId(id);
+        enregistrerPreference('langueId', id);
+      },
       langues: LANGUES,
       t,
     };

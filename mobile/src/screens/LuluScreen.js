@@ -67,7 +67,7 @@ export default function LuluScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <ScreenHeader title="Lulu Parent" subtitle="Votre assistant RACINES" onBack={() => navigation.goBack()} />
+      <ScreenHeader title={t('lulu_title')} subtitle={t('lulu_subtitle')} onBack={() => navigation.goBack()} />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -104,7 +104,10 @@ export default function LuluScreen({ navigation }) {
                     <Text style={styles.suggestionSource}>
                       {t('lulu_source')} : {item.moduleSuggere.moduleOrigine}
                     </Text>
-                    <Text style={styles.suggestionArrow}>{t('common_open_module')} →</Text>
+                    <View style={styles.suggestionAction}>
+                      <Text style={styles.suggestionArrow}>{t('common_open_module')}</Text>
+                      <UiIcon name="arrowRight" size={13} color={colors.accent} />
+                    </View>
                   </Pressable>
                 )}
               </View>
@@ -121,16 +124,16 @@ export default function LuluScreen({ navigation }) {
             onChangeText={setSaisie}
             onSubmitEditing={envoyerMessage}
             returnKeyType="send"
-            accessibilityLabel="Votre question à Lulu"
-            accessibilityHint="Écrivez une question sur votre enfant puis envoyez-la."
+            accessibilityLabel={t('lulu_input_a11y')}
+            accessibilityHint={t('lulu_input_hint')}
           />
           <Pressable
             style={[styles.sendButton, enAttente && styles.sendButtonDisabled]}
             onPress={envoyerMessage}
             disabled={enAttente}
             accessibilityRole="button"
-            accessibilityLabel="Envoyer la question à Lulu"
-            accessibilityHint="Lulu vous orientera vers un module approprié ou vers une aide urgente si nécessaire."
+            accessibilityLabel={t('lulu_send_a11y')}
+            accessibilityHint={t('lulu_send_hint')}
             accessibilityState={{ disabled: enAttente }}
           >
             {enAttente ? (
@@ -164,6 +167,7 @@ function getStyles(colors) {
     suggestionCard: { marginTop: 10, backgroundColor: colors.surfaceAlt, borderRadius: 10, padding: 10 },
     suggestionTitle: { fontSize: 13, fontWeight: '700', color: colors.textPrimary, marginBottom: 4 },
     suggestionSource: { fontSize: 11, color: colors.textSecondary, marginBottom: 4 },
+    suggestionAction: { flexDirection: 'row', alignItems: 'center', gap: 5 },
     suggestionArrow: { fontSize: 12, color: colors.accent, fontWeight: '600' },
     inputRow: {
       flexDirection: 'row', alignItems: 'center', padding: 12, gap: 8,

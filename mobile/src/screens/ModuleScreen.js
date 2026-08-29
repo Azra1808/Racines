@@ -9,8 +9,9 @@ import ModuleIllustration from '../components/ModuleIllustration';
 import { MODULES } from '../data/modules';
 import { marquerModuleTermine, getProgressionModule, getProgressionSousModules } from '../data/db';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 
-function SousModuleCard({ sousModule, index, progress, colors, styles, onPress }) {
+function SousModuleCard({ sousModule, index, progress, colors, styles, onPress, t }) {
   const done = !!progress?.termine;
   return (
     <Pressable
@@ -20,8 +21,8 @@ function SousModuleCard({ sousModule, index, progress, colors, styles, onPress }
       ]}
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`Partie ${index + 1} : ${sousModule.titre}${done ? ', terminée' : ''}`}
-      accessibilityHint="Ouvre les cinq questions de cette partie."
+      accessibilityLabel={done ? t('module_part_done', { n: index + 1, titre: sousModule.titre }) : t('module_part_label', { n: index + 1, titre: sousModule.titre })}
+      accessibilityHint={t('module_part_hint')}
     >
       <View style={[styles.smIconWrap, { backgroundColor: colors.surfaceAlt }]}>
         <PictoIcon name={sousModule.icone} size={22} color={colors.accent} />
@@ -42,6 +43,7 @@ function SousModuleCard({ sousModule, index, progress, colors, styles, onPress }
 
 export default function ModuleScreen({ route, navigation }) {
   const { colors, isSimplifiedMode } = useTheme();
+  const { t } = useLanguage();
   const { moduleId } = route.params;
   const module = MODULES.find((m) => m.id === moduleId);
 
@@ -110,7 +112,7 @@ export default function ModuleScreen({ route, navigation }) {
   if (!module) {
     return (
       <View style={styles.container}>
-        <ScreenHeader title="Module introuvable" onBack={() => navigation.goBack()} />
+        <ScreenHeader title={t('module_not_found')} onBack={() => navigation.goBack()} />
       </View>
     );
   }
@@ -131,8 +133,8 @@ export default function ModuleScreen({ route, navigation }) {
         <View
           style={styles.progressTrack}
           accessibilityRole="progressbar"
-          accessibilityLabel="Progression de la lecture audio"
-          accessibilityValue={{ text: isSpeaking ? 'Lecture en cours' : 'Lecture arrêtée' }}
+          accessibilityLabel={t('module_audio_progress')}
+          accessibilityValue={{ text: isSpeaking ? t('module_audio_playing') : t('module_audio_stopped') }}
         >
           <Animated.View style={[styles.progressFill, { width: progressWidth }]} />
         </View>
@@ -142,11 +144,11 @@ export default function ModuleScreen({ route, navigation }) {
             style={styles.playButton}
             onPress={handlePlay}
             accessibilityRole="button"
-            accessibilityLabel={isSpeaking ? 'Arrêter la lecture audio' : 'Écouter le module'}
-            accessibilityHint="La lecture dépend de la voix française disponible sur le téléphone."
+            accessibilityLabel={isSpeaking ? t('module_stop_a11y') : t('module_listen')}
+            accessibilityHint={t('module_audio_hint')}
           >
             <UiIcon name={isSpeaking ? 'pause' : 'play'} size={18} color={colors.accentText} />
-            <Text style={styles.playButtonText}>{isSpeaking ? 'Arrêter la lecture' : 'Écouter le module'}</Text>
+            <Text style={styles.playButtonText}>{isSpeaking ? t('module_stop') : t('module_listen')}</Text>
           </Pressable>
         </Animated.View>
 
@@ -168,18 +170,18 @@ export default function ModuleScreen({ route, navigation }) {
         {completed && (
           <View style={styles.completedBadge}>
             <UiIcon name="check" size={16} color={colors.accent} />
-            <Text style={styles.completedText}>Module lu</Text>
+            <Text style={styles.completedText}>{t('module_read')}</Text>
           </View>
         )}
 
         <View style={styles.sectionHeaderRow}>
-          <Text style={styles.sectionTitle}>Les 4 parties du module</Text>
+          <Text style={styles.sectionTitle}>{t('module_parts_title', { n: module.sousModules.length })}</Text>
           <Text style={styles.sectionCount}>{doneCount}/{module.sousModules.length}</Text>
         </View>
 
         <View style={styles.smList}>
           {module.sousModules.map((sm, i) => (
-            <SousModuleCard
+            <SousModuleCard t={t}
               key={sm.id}
               sousModule={sm}
               index={i}
@@ -199,8 +201,8 @@ export default function ModuleScreen({ route, navigation }) {
           accessibilityState={{ disabled: !allSousModulesDone }}
           accessibilityLabel={
             allSousModulesDone
-              ? `${bilanDone ? 'Refaire le bilan' : 'Bilan'} du module ${module.titre}, 20 questions`
-              : `Bilan verrouillé : terminez les ${module.sousModules.length} parties pour le débloquer`
+              ? t('quiz_bilan_a11y', { n: 20 })
+              : t('module_bilan_locked_a11y', { n: module.sousModules.length })
           }
         >
           <View style={[styles.bilanIconWrap, { backgroundColor: allSousModulesDone ? 'rgba(255,255,255,0.18)' : colors.border }]}>
@@ -208,12 +210,12 @@ export default function ModuleScreen({ route, navigation }) {
           </View>
           <View style={styles.smText}>
             <Text style={[styles.bilanTitle, { color: allSousModulesDone ? colors.accentText : colors.textMuted }]}>
-              {bilanDone ? 'Refaire le bilan du module' : 'Bilan du module'}
+              {bilanDone ? t('module_bilan_redo') : t('module_bilan')}
             </Text>
             <Text style={[styles.bilanDesc, { color: allSousModulesDone ? colors.accentText : colors.textMuted }]}>
               {allSousModulesDone
-                ? '20 questions pour valider tout ce que vous avez appris'
-                : `Terminez les ${module.sousModules.length} parties pour débloquer le bilan`}
+                ? t('module_bilan_desc', { n: 20 })
+                : t('module_bilan_locked', { n: module.sousModules.length })}
             </Text>
           </View>
         </Pressable>

@@ -35,11 +35,11 @@ export default function ParametresScreen({ navigation }) {
                   onPress={() => setTheme(theme.id)}
                   accessibilityRole="radio"
                   accessibilityState={{ selected }}
-                  accessibilityLabel={`Thème ${theme.label}`}
+                  accessibilityLabel={t('settings_theme_label', { nom: t(theme.cleTraduction) })}
                 >
                   <View style={[styles.swatch, { backgroundColor: theme.swatch }]} />
                   <Text style={[styles.themeLabel, { color: colors.textPrimary, fontSize: rf(13) }]}>
-                    {theme.label}
+                    {t(theme.cleTraduction)}
                   </Text>
                   {selected && (
                     <View style={styles.checkMark}>
@@ -98,6 +98,15 @@ export default function ParametresScreen({ navigation }) {
                 </Pressable>
               );
             })}
+
+            {langues.find((l) => l.id === langueId)?.complete === false && (
+              <Text
+                style={[styles.avertissementLangue, { color: colors.textMuted, fontSize: rf(12) }]}
+                accessibilityRole="alert"
+              >
+                {t('lang_partial_notice')}
+              </Text>
+            )}
           </View>
         </View>
 
@@ -110,6 +119,7 @@ export default function ParametresScreen({ navigation }) {
           <Text style={[styles.linkText, { color: colors.accent, fontSize: rf(15) }]}>
             {t('settings_accessibility_link')}
           </Text>
+          <UiIcon name="arrowRight" size={15} color={colors.accent} />
         </Pressable>
 
       </ScrollView>
@@ -119,6 +129,7 @@ export default function ParametresScreen({ navigation }) {
 
 function getStyles(colors) {
   return StyleSheet.create({
+    avertissementLangue: { marginTop: 10, lineHeight: 17 },
     container: { flex: 1, backgroundColor: colors.background },
     content: { padding: 20, gap: 16 },
     card: {
@@ -146,7 +157,8 @@ function getStyles(colors) {
     },
     languageBadgeText: { fontSize: 11, fontWeight: '800' },
     languageLabel: { fontWeight: '700', flex: 1 },
-    linkRow: { alignItems: 'center', paddingVertical: 10 },
+    linkRow: {
+      flexDirection: 'row', alignItems: 'center', gap: 6, alignItems: 'center', paddingVertical: 10 },
     linkText: { fontWeight: '700' },
   });
 }

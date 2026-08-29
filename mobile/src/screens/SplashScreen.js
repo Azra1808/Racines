@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
 import { LinearGradient as ScreenGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Path, G, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const { width } = Dimensions.get('window');
 
@@ -18,6 +19,7 @@ const PETAL_ANGLES = [0, 60, 120, 180, 240, 300];
 
 export default function SplashScreen({ navigation }) {
   const { colors } = useTheme();
+  const { t } = useLanguage();
 
   // Étape 1 — la graine dans le pot
   const potOpacity = useRef(new Animated.Value(0)).current;
@@ -234,7 +236,7 @@ export default function SplashScreen({ navigation }) {
         </Animated.View>
 
         <Animated.Text style={[styles.slogan, { opacity: sloganOpacity }]}>
-          Grandir avec amour, dès les premières racines.
+          {t('splash_slogan')}
         </Animated.Text>
       </View>
     </View>

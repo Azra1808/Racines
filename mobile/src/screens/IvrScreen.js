@@ -15,11 +15,13 @@ import ScreenHeader from '../components/ScreenHeader';
 import UiIcon from '../components/icons/UiIcon';
 import { useTheme } from '../context/ThemeContext';
 import { NUMERO_VOCAL, LANGUES, resoudreEtapeIvr } from '../data/ivrMenu';
+import { useLanguage } from '../context/LanguageContext';
 
 const TOUCHES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
 
 export default function IvrScreen({ navigation }) {
   const { colors, rf } = useTheme();
+  const { t } = useLanguage();
   const [enAppel, setEnAppel] = useState(false);
   const [etapes, setEtapes] = useState([]);
   const [parle, setParle] = useState(false);
@@ -74,8 +76,8 @@ export default function IvrScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <ScreenHeader
-        title="Canal vocal (IVR)"
-        subtitle="Pour les parents qui n'écrivent pas"
+        title={t('ivr_title')}
+        subtitle={t('ivr_subtitle')}
         onBack={() => navigation.goBack()}
       />
 
@@ -91,7 +93,7 @@ export default function IvrScreen({ navigation }) {
             style={styles.phoneScreen}
             accessibilityLiveRegion="polite"
             accessibilityLabel={
-              enAppel ? `Le serveur dit : ${etat.texte}` : `Prêt à appeler le ${NUMERO_VOCAL}`
+              enAppel ? t('ivr_server_says', { texte: etat.texte }) : t('ivr_ready_to_call', { numero: NUMERO_VOCAL })
             }
           >
             {!enAppel ? (
@@ -100,7 +102,7 @@ export default function IvrScreen({ navigation }) {
                   {NUMERO_VOCAL}
                 </Text>
                 <Text style={[styles.hint, { fontSize: rf(11) }]}>
-                  Appuyez sur Appeler
+                  {t('ivr_press_call')}
                 </Text>
               </>
             ) : (
@@ -108,7 +110,7 @@ export default function IvrScreen({ navigation }) {
                 <View style={styles.statutLigne}>
                   <View style={[styles.pastille, parle && styles.pastilleActive]} />
                   <Text style={[styles.statut, { fontSize: rf(11) }]}>
-                    {parle ? 'Le serveur parle…' : etat.enCours ? 'En attente de votre choix' : 'Appel terminé'}
+                    {parle ? t('ivr_server_speaking') : etat.enCours ? t('ivr_waiting') : t('ivr_call_ended')}
                   </Text>
                 </View>
                 <Text style={[styles.transcription, { fontSize: rf(13) }]}>
@@ -127,7 +129,7 @@ export default function IvrScreen({ navigation }) {
                 onPress={() => appuyerTouche(touche)}
                 disabled={!enAppel}
                 accessibilityRole="button"
-                accessibilityLabel={`Touche ${touche}`}
+                accessibilityLabel={t('ivr_key', { touche })}
                 accessibilityState={{ disabled: !enAppel }}
               >
                 <Text style={[styles.keyText, { fontSize: rf(19) }]}>{touche}</Text>
@@ -141,26 +143,26 @@ export default function IvrScreen({ navigation }) {
                 style={[styles.action, styles.actionPrimary]}
                 onPress={appeler}
                 accessibilityRole="button"
-                accessibilityLabel={`Appeler le ${NUMERO_VOCAL}`}
+                accessibilityLabel={t('ivr_call_number', { numero: NUMERO_VOCAL })}
               >
                 <UiIcon name="call" size={15} color={colors.accentText} />
-                <Text style={styles.actionPrimaryText}>Appeler</Text>
+                <Text style={styles.actionPrimaryText}>{t('ivr_call')}</Text>
               </Pressable>
             ) : (
               <Pressable
                 style={[styles.action, styles.actionDanger]}
                 onPress={raccrocher}
                 accessibilityRole="button"
-                accessibilityLabel="Raccrocher"
+                accessibilityLabel={t('ivr_hangup')}
               >
-                <Text style={styles.actionDangerText}>Raccrocher</Text>
+                <Text style={styles.actionDangerText}>{t('ivr_hangup')}</Text>
               </Pressable>
             )}
           </View>
         </View>
 
         {/* --- Langues : ce qui marche, et ce qui est daté --- */}
-        <Text style={[styles.sectionTitre, { fontSize: rf(13) }]}>Langues du canal vocal</Text>
+        <Text style={[styles.sectionTitre, { fontSize: rf(13) }]}>{t('ivr_languages_title')}</Text>
         <View style={styles.langues}>
           {LANGUES.map((langue) => (
             <View
@@ -168,13 +170,13 @@ export default function IvrScreen({ navigation }) {
               style={[styles.langue, !langue.disponible && styles.langueAVenir]}
               accessibilityLabel={
                 langue.disponible
-                  ? `${langue.nom}, disponible`
-                  : `${langue.nom}, à venir : ${langue.note}`
+                  ? `${langue.nom}, ${t('ivr_available')}`
+                  : t('ivr_lang_coming', { langue: langue.nom, note: langue.note })
               }
             >
               <Text style={[styles.langueNom, { fontSize: rf(13) }]}>{langue.nom}</Text>
               <Text style={[styles.langueEtat, { fontSize: rf(10) }]}>
-                {langue.disponible ? 'Disponible' : langue.note}
+                {langue.disponible ? t('ivr_available') : langue.note}
               </Text>
             </View>
           ))}

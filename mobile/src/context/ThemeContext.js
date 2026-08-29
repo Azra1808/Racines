@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useMemo } from 'react';
+import { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import { lirePreferences, enregistrerPreference } from '../data/db';
 
 // 4 thèmes de couleur, sélectionnables dans Paramètres.
 // "contraste" reste par ailleurs le thème d'accessibilité (texte vif sur
@@ -9,6 +10,7 @@ export const THEMES = {
   nature: {
     id: 'nature',
     label: 'Nature',
+    cleTraduction: 'theme_nature',
     swatch: '#1c6b3f',
     colors: {
       background: '#f7f4ee',
@@ -30,6 +32,7 @@ export const THEMES = {
   soleil: {
     id: 'soleil',
     label: 'Soleil',
+    cleTraduction: 'theme_soleil',
     swatch: '#c9682e',
     colors: {
       background: '#fbf3ea',
@@ -51,6 +54,7 @@ export const THEMES = {
   ocean: {
     id: 'ocean',
     label: 'Océan',
+    cleTraduction: 'theme_ocean',
     swatch: '#1a5f7a',
     colors: {
       background: '#eef6f8',
@@ -72,6 +76,7 @@ export const THEMES = {
   contraste: {
     id: 'contraste',
     label: 'Contraste élevé',
+    cleTraduction: 'theme_contraste',
     swatch: '#ffd60a',
     colors: {
       background: '#000000',
@@ -105,15 +110,41 @@ export function ThemeProvider({ children }) {
   const [fontScale, setFontScale] = useState(1);
   const [isSimplifiedMode, setIsSimplifiedMode] = useState(false);
 
+  // Relecture des réglages au démarrage. Ils doivent survivre à la fermeture
+  // de l'application : un contraste élevé qu'il faut réactiver chaque matin
+  // n'aide personne.
+  useEffect(() => {
+    let annule = false;
+    lirePreferences().then((prefs) => {
+      if (annule) return;
+      if (prefs.themeId) setThemeId(prefs.themeId);
+      if (prefs.fontScale) {
+        const valeur = Number(prefs.fontScale);
+        if (Number.isFinite(valeur)) {
+          setFontScale(Math.min(FONT_SCALE_MAX, Math.max(FONT_SCALE_MIN, valeur)));
+        }
+      }
+      if (prefs.isSimplifiedMode) setIsSimplifiedMode(prefs.isSimplifiedMode === 'true');
+    });
+    return () => { annule = true; };
+  }, []);
+
   const value = useMemo(() => {
+    function majFontScale(calcul) {
+      setFontScale((v) => {
+        const suivant = calcul(v);
+        enregistrerPreference('fontScale', suivant);
+        return suivant;
+      });
+    }
     function increaseFontScale() {
-      setFontScale((v) => Math.min(FONT_SCALE_MAX, +(v + FONT_SCALE_STEP).toFixed(2)));
+      majFontScale((v) => Math.min(FONT_SCALE_MAX, +(v + FONT_SCALE_STEP).toFixed(2)));
     }
     function decreaseFontScale() {
-      setFontScale((v) => Math.max(FONT_SCALE_MIN, +(v - FONT_SCALE_STEP).toFixed(2)));
+      majFontScale((v) => Math.max(FONT_SCALE_MIN, +(v - FONT_SCALE_STEP).toFixed(2)));
     }
     function resetFontScale() {
-      setFontScale(1);
+      majFontScale(() => 1);
     }
     function rf(size) {
       return Math.round(size * fontScale);
@@ -123,7 +154,10 @@ export function ThemeProvider({ children }) {
 
     return {
       themeId,
-      setTheme: setThemeId,
+      setTheme: (id) => {
+        setThemeId(id);
+        enregistrerPreference('themeId', id);
+      },
       themes: THEME_ORDER.map((id) => THEMES[id]),
       colors: THEMES[themeId].colors,
 
@@ -132,7 +166,12 @@ export function ThemeProvider({ children }) {
       // le bouton/interrupteur historique continue de fonctionner (bascule
       // entre le dernier thème "normal" utilisé et le contraste élevé).
       isHighContrast,
-      toggleContrast: () => setThemeId((v) => (v === 'contraste' ? 'nature' : 'contraste')),
+      toggleContrast: () =>
+        setThemeId((v) => {
+          const suivant = v === 'contraste' ? 'nature' : 'contraste';
+          enregistrerPreference('themeId', suivant);
+          return suivant;
+        }),
 
       fontScale,
       fontScaleMin: FONT_SCALE_MIN,
@@ -142,7 +181,11 @@ export function ThemeProvider({ children }) {
       resetFontScale,
       rf,
       isSimplifiedMode,
-      toggleSimplifiedMode: () => setIsSimplifiedMode((v) => !v),
+      toggleSimplifiedMode: () =>
+        setIsSimplifiedMode((v) => {
+          enregistrerPreference('isSimplifiedMode', !v);
+          return !v;
+        }),
     };
   }, [themeId, fontScale, isSimplifiedMode]);
 

@@ -5,9 +5,11 @@ import UiIcon from '../components/icons/UiIcon';
 import { MODULES } from '../data/modules';
 import { marquerSousModuleTermine, enregistrerScoreBilan } from '../data/db';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function QuizScreen({ route, navigation }) {
   const { colors } = useTheme();
+  const { t } = useLanguage();
   const { moduleId, mode = 'submodule', sousModuleIndex = 0 } = route.params;
   const module = MODULES.find((m) => m.id === moduleId);
 
@@ -28,8 +30,8 @@ export default function QuizScreen({ route, navigation }) {
   if (!module || questions.length === 0) {
     return (
       <View style={styles.container}>
-        <ScreenHeader title="Quiz" onBack={() => navigation.goBack()} />
-        <Text style={styles.empty}>Ce quiz arrive bientôt.</Text>
+        <ScreenHeader title={t('quiz_title')} onBack={() => navigation.goBack()} />
+        <Text style={styles.empty}>{t('quiz_coming_soon')}</Text>
       </View>
     );
   }
@@ -79,8 +81,8 @@ export default function QuizScreen({ route, navigation }) {
     return (
       <View style={styles.container}>
         <ScreenHeader
-          title="Résultat"
-          subtitle={isBilan ? `Bilan · ${module.titre}` : `${sousModule.titre} · ${module.titre}`}
+          title={t('quiz_result')}
+          subtitle={isBilan ? t('quiz_bilan_header', { titre: module.titre }) : `${sousModule.titre} · ${module.titre}`}
           onBack={goToModule}
         />
         <View style={styles.resultBox}>
@@ -88,7 +90,7 @@ export default function QuizScreen({ route, navigation }) {
             <UiIcon name={perfect ? 'trophy' : 'thumbsUp'} size={40} color={colors.accent} />
           </View>
           <Text style={styles.resultTitle}>
-            {isBilan ? 'Bilan terminé !' : `Partie ${sousModuleIndex + 1} terminée !`}
+            {isBilan ? t('quiz_bilan_done') : t('quiz_part_done', { n: sousModuleIndex + 1 })}
           </Text>
           <Text style={styles.resultScore}>{finalScore} / {questions.length} bonnes réponses</Text>
 
@@ -97,10 +99,10 @@ export default function QuizScreen({ route, navigation }) {
               style={styles.button}
               onPress={startBilan}
               accessibilityRole="button"
-              accessibilityLabel="Faire le bilan du module, 20 questions"
+              accessibilityLabel={t('quiz_bilan_a11y', { n: 20 })}
             >
               <UiIcon name="trophy" size={16} color={colors.accentText} />
-              <Text style={styles.buttonText}>Faire le bilan du module (20 questions)</Text>
+              <Text style={styles.buttonText}>{t('quiz_bilan_cta', { n: 20 })}</Text>
             </Pressable>
           )}
 
@@ -109,9 +111,9 @@ export default function QuizScreen({ route, navigation }) {
               style={styles.button}
               onPress={goToNextSousModule}
               accessibilityRole="button"
-              accessibilityLabel="Passer à la partie suivante"
+              accessibilityLabel={t('quiz_next_part_a11y')}
             >
-              <Text style={styles.buttonText}>Partie suivante</Text>
+              <Text style={styles.buttonText}>{t('quiz_next_part')}</Text>
             </Pressable>
           )}
 
@@ -119,9 +121,9 @@ export default function QuizScreen({ route, navigation }) {
             style={styles.secondaryButton}
             onPress={goToModule}
             accessibilityRole="button"
-            accessibilityLabel="Revenir au module"
+            accessibilityLabel={t('quiz_back_module_a11y')}
           >
-            <Text style={styles.secondaryButtonText}>Retour au module</Text>
+            <Text style={styles.secondaryButtonText}>{t('quiz_back_module')}</Text>
           </Pressable>
         </View>
       </View>
@@ -131,8 +133,8 @@ export default function QuizScreen({ route, navigation }) {
   return (
     <View style={styles.container}>
       <ScreenHeader
-        title={`Question ${currentIndex + 1} / ${questions.length}`}
-        subtitle={isBilan ? `Bilan · ${module.titre}` : `${sousModule.titre} · ${module.titre}`}
+        title={t('quiz_progress', { n: currentIndex + 1, total: questions.length })}
+        subtitle={isBilan ? t('quiz_bilan_header', { titre: module.titre }) : `${sousModule.titre} · ${module.titre}`}
         onBack={() => navigation.goBack()}
       />
       <ScrollView contentContainerStyle={styles.content}>
@@ -152,9 +154,9 @@ export default function QuizScreen({ route, navigation }) {
               onPress={() => handleSelect(index)}
               accessibilityRole="radio"
               accessibilityState={{ selected: isSelected, disabled: answered }}
-              accessibilityLabel={`Réponse ${index + 1} : ${option}`}
+              accessibilityLabel={t('quiz_answer_label', { n: index + 1, option })}
               accessibilityHint={
-                answered ? 'La réponse a déjà été validée.' : 'Double-tapez pour choisir cette réponse.'
+                answered ? t('quiz_answer_locked') : t('quiz_answer_hint')
               }
             >
               <Text style={styles.optionText}>{option}</Text>
@@ -170,12 +172,12 @@ export default function QuizScreen({ route, navigation }) {
             accessibilityRole="button"
             accessibilityLabel={
               currentIndex + 1 < questions.length
-                ? 'Passer à la question suivante'
-                : 'Afficher le résultat du quiz'
+                ? t('quiz_next_q_a11y')
+                : t('quiz_show_result_a11y')
             }
           >
             <Text style={styles.buttonText}>
-              {currentIndex + 1 < questions.length ? 'Question suivante' : 'Voir le résultat'}
+              {currentIndex + 1 < questions.length ? t('quiz_next_question') : t('quiz_see_result')}
             </Text>
           </Pressable>
         )}
