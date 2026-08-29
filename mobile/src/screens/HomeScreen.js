@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useTheme } from '../context/ThemeContext';
-import { MODULES } from '../data/modules';
+import { useLanguage } from '../context/LanguageContext';
 
 const { width, height } = Dimensions.get('window');
 const HERO_HEIGHT = Math.round(height * 0.5);
@@ -14,12 +14,7 @@ const HERO_HEIGHT = Math.round(height * 0.5);
 function OfflineIcon({ color, size = 20 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path
-        d="M6 17a4 4 0 0 1 .4-7.98 5.5 5.5 0 0 1 10.6-1.4A4.5 4.5 0 0 1 17.5 17H6Z"
-        stroke={color}
-        strokeWidth={1.7}
-        strokeLinejoin="round"
-      />
+      <Path d="M6 17a4 4 0 0 1 .4-7.98 5.5 5.5 0 0 1 10.6-1.4A4.5 4.5 0 0 1 17.5 17H6Z" stroke={color} strokeWidth={1.7} strokeLinejoin="round" />
       <Path d="M9 14.5l6-5M9 9.5l6 5" stroke={color} strokeWidth={1.7} strokeLinecap="round" />
     </Svg>
   );
@@ -38,18 +33,8 @@ function AudioIcon({ color, size = 20 }) {
 function ModulesIcon({ color, size = 20 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path
-        d="M12 6.5c-1.4-1.1-3.4-1.5-5.5-1.2v11.6c2.1-.3 4.1.1 5.5 1.2V6.5Z"
-        stroke={color}
-        strokeWidth={1.7}
-        strokeLinejoin="round"
-      />
-      <Path
-        d="M12 6.5c1.4-1.1 3.4-1.5 5.5-1.2v11.6c-2.1-.3-4.1.1-5.5 1.2V6.5Z"
-        stroke={color}
-        strokeWidth={1.7}
-        strokeLinejoin="round"
-      />
+      <Path d="M12 6.5c-1.4-1.1-3.4-1.5-5.5-1.2v11.6c2.1-.3 4.1.1 5.5 1.2V6.5Z" stroke={color} strokeWidth={1.7} strokeLinejoin="round" />
+      <Path d="M12 6.5c1.4-1.1 3.4-1.5 5.5-1.2v11.6c-2.1-.3-4.1.1-5.5 1.2V6.5Z" stroke={color} strokeWidth={1.7} strokeLinejoin="round" />
     </Svg>
   );
 }
@@ -65,12 +50,7 @@ function ArrowIcon({ color, size = 16 }) {
 function ChatIcon({ color, size = 16 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path
-        d="M4 5.5h16v10H9.5L5.5 19v-3.5H4v-10Z"
-        stroke={color}
-        strokeWidth={1.7}
-        strokeLinejoin="round"
-      />
+      <Path d="M4 5.5h16v10H9.5L5.5 19v-3.5H4v-10Z" stroke={color} strokeWidth={1.7} strokeLinejoin="round" />
     </Svg>
   );
 }
@@ -81,9 +61,7 @@ function GearIcon({ color, size = 18 }) {
       <Circle cx={12} cy={12} r={3} stroke={color} strokeWidth={1.6} />
       <Path
         d="M12 3.5v2M12 18.5v2M20.5 12h-2M5.5 12h-2M17.7 6.3l-1.4 1.4M7.7 16.3l-1.4 1.4M17.7 17.7l-1.4-1.4M7.7 7.7 6.3 6.3"
-        stroke={color}
-        strokeWidth={1.6}
-        strokeLinecap="round"
+        stroke={color} strokeWidth={1.6} strokeLinecap="round"
       />
     </Svg>
   );
@@ -92,48 +70,25 @@ function GearIcon({ color, size = 18 }) {
 // Tracé de racines décoratif derrière le héros — clin d'œil au splashscreen
 function RootTracery({ color }) {
   return (
-    <Svg
-      width={width}
-      height={HERO_HEIGHT}
-      viewBox={`0 0 ${width} ${HERO_HEIGHT}`}
-      style={{ position: 'absolute', top: 0, left: 0 }}
-    >
-      <Path
-        d={`M${width * 0.5},${HERO_HEIGHT} C${width * 0.35},${HERO_HEIGHT * 0.7} ${width * 0.2},${HERO_HEIGHT * 0.6} ${width * 0.08},${HERO_HEIGHT * 0.32}`}
-        stroke={color}
-        strokeWidth={1.2}
-        fill="none"
-      />
-      <Path
-        d={`M${width * 0.5},${HERO_HEIGHT} C${width * 0.4},${HERO_HEIGHT * 0.75} ${width * 0.32},${HERO_HEIGHT * 0.55} ${width * 0.3},${HERO_HEIGHT * 0.2}`}
-        stroke={color}
-        strokeWidth={1.2}
-        fill="none"
-      />
-      <Path
-        d={`M${width * 0.5},${HERO_HEIGHT} C${width * 0.65},${HERO_HEIGHT * 0.7} ${width * 0.8},${HERO_HEIGHT * 0.6} ${width * 0.92},${HERO_HEIGHT * 0.32}`}
-        stroke={color}
-        strokeWidth={1.2}
-        fill="none"
-      />
-      <Path
-        d={`M${width * 0.5},${HERO_HEIGHT} C${width * 0.6},${HERO_HEIGHT * 0.75} ${width * 0.68},${HERO_HEIGHT * 0.55} ${width * 0.7},${HERO_HEIGHT * 0.2}`}
-        stroke={color}
-        strokeWidth={1.2}
-        fill="none"
-      />
+    <Svg width={width} height={HERO_HEIGHT} viewBox={`0 0 ${width} ${HERO_HEIGHT}`} style={{ position: 'absolute', top: 0, left: 0 }}>
+      <Path d={`M${width * 0.5},${HERO_HEIGHT} C${width * 0.35},${HERO_HEIGHT * 0.7} ${width * 0.2},${HERO_HEIGHT * 0.6} ${width * 0.08},${HERO_HEIGHT * 0.32}`} stroke={color} strokeWidth={1.2} fill="none" />
+      <Path d={`M${width * 0.5},${HERO_HEIGHT} C${width * 0.4},${HERO_HEIGHT * 0.75} ${width * 0.32},${HERO_HEIGHT * 0.55} ${width * 0.3},${HERO_HEIGHT * 0.2}`} stroke={color} strokeWidth={1.2} fill="none" />
+      <Path d={`M${width * 0.5},${HERO_HEIGHT} C${width * 0.65},${HERO_HEIGHT * 0.7} ${width * 0.8},${HERO_HEIGHT * 0.6} ${width * 0.92},${HERO_HEIGHT * 0.32}`} stroke={color} strokeWidth={1.2} fill="none" />
+      <Path d={`M${width * 0.5},${HERO_HEIGHT} C${width * 0.6},${HERO_HEIGHT * 0.75} ${width * 0.68},${HERO_HEIGHT * 0.55} ${width * 0.7},${HERO_HEIGHT * 0.2}`} stroke={color} strokeWidth={1.2} fill="none" />
     </Svg>
   );
 }
 
-const FEATURES = [
-  { Icon: OfflineIcon, label: 'Hors connexion' },
-  { Icon: AudioIcon, label: 'Lecture audio' },
-  { Icon: ModulesIcon, label: `${MODULES.length} modules` },
-];
-
 export default function HomeScreen({ navigation }) {
   const { colors } = useTheme();
+  const { t } = useLanguage();
+
+  const FEATURES = [
+    { Icon: OfflineIcon, label: t('home_feature_offline') },
+    { Icon: AudioIcon, label: t('home_feature_audio') },
+    { Icon: ModulesIcon, label: t('home_feature_modules') },
+  ];
+
   const badgeAnim = useRef(new Animated.Value(0)).current;
   const titleAnim = useRef(new Animated.Value(24)).current;
   const titleFade = useRef(new Animated.Value(0)).current;
@@ -170,9 +125,9 @@ export default function HomeScreen({ navigation }) {
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <View style={styles.topBar}>
           <Pressable
-            onPress={() => navigation.navigate('Accessibility')}
+            onPress={() => navigation.navigate('Parametres')}
             style={styles.contrastButton}
-            accessibilityLabel="Ouvrir les réglages d'accessibilité"
+            accessibilityLabel={t('nav_settings')}
           >
             <GearIcon color="#fff" size={17} />
           </Pressable>
@@ -182,31 +137,22 @@ export default function HomeScreen({ navigation }) {
           <Animated.View style={[styles.badge, { transform: [{ scale: badgeAnim }] }]}>
             <View style={styles.badgeInner}>
               <Svg width={26} height={26} viewBox="0 0 24 24" fill="none">
-                <Path
-                  d="M12 21c0-5 3-7 6-9-3 .5-6 2-6 6 0-4-3-5.5-6-6 3 2 6 4 6 9Z"
-                  fill="#c98a2e"
-                />
+                <Path d="M12 21c0-5 3-7 6-9-3 .5-6 2-6 6 0-4-3-5.5-6-6 3 2 6 4 6 9Z" fill="#c98a2e" />
               </Svg>
             </View>
           </Animated.View>
 
           <Animated.View style={{ opacity: titleFade, transform: [{ translateY: titleAnim }] }}>
-            <Text style={styles.eyebrow}>Programme de parentalité positive</Text>
+            <Text style={styles.eyebrow}>{t('home_eyebrow')}</Text>
             <View style={styles.eyebrowRule} />
             <Text style={styles.title}>RACINES</Text>
-            <Text style={styles.subtitle}>
-              Des conseils simples et fiables pour accompagner votre enfant,
-              à chaque étape de sa vie.
-            </Text>
+            <Text style={styles.subtitle}>{t('home_subtitle')}</Text>
           </Animated.View>
         </View>
 
         <View style={styles.sheetWrap}>
           <Svg width={width} height={36} viewBox={`0 0 ${width} 36`} style={styles.sheetWave}>
-            <Path
-              d={`M0,36 Q${width / 2},-6 ${width},36 L${width},36 L0,36 Z`}
-              fill={colors.background}
-            />
+            <Path d={`M0,36 Q${width / 2},-6 ${width},36 L${width},36 L0,36 Z`} fill={colors.background} />
           </Svg>
 
           <View style={styles.sheet}>
@@ -226,7 +172,7 @@ export default function HomeScreen({ navigation }) {
                 style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
                 onPress={() => navigation.navigate('Catalog')}
               >
-                <Text style={styles.buttonText}>Découvrir les modules</Text>
+                <Text style={styles.buttonText}>{t('home_btn_discover')}</Text>
                 <ArrowIcon color={isHighContrast ? colors.accentText : '#164f30'} size={16} />
               </Pressable>
 
@@ -235,11 +181,11 @@ export default function HomeScreen({ navigation }) {
                 onPress={() => navigation.navigate('Lulu')}
               >
                 <ChatIcon color={colors.accent} size={16} />
-                <Text style={styles.secondaryButtonText}>Parler à Lulu</Text>
+                <Text style={styles.secondaryButtonText}>{t('home_btn_lulu')}</Text>
               </Pressable>
             </Animated.View>
 
-            <Text style={styles.footer}>Contenus issus du guide officiel UNICEF Cameroun</Text>
+            <Text style={styles.footer}>{t('home_footer')}</Text>
           </View>
         </View>
       </SafeAreaView>
@@ -297,10 +243,7 @@ function getStyles(colors) {
       flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
     },
     buttonPressed: { opacity: 0.85 },
-    buttonText: {
-      color: isHighContrast ? colors.accentText : '#164f30',
-      fontSize: 16, fontWeight: '700',
-    },
+    buttonText: { color: isHighContrast ? colors.accentText : '#164f30', fontSize: 16, fontWeight: '700' },
     secondaryButton: {
       borderWidth: 1.5, borderColor: colors.accent, paddingVertical: 15,
       borderRadius: 999, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
