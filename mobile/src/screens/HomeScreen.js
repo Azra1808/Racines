@@ -54,6 +54,7 @@ export default function HomeScreen({ navigation }) {
           <Pressable
             onPress={() => navigation.navigate('Parametres')}
             style={styles.contrastButton}
+            accessibilityRole="button"
             accessibilityLabel={t('nav_settings')}
           >
             <Text style={styles.contrastIcon}>⚙️</Text>
@@ -86,6 +87,9 @@ export default function HomeScreen({ navigation }) {
             <Pressable
               style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
               onPress={() => navigation.navigate('Catalog')}
+              accessibilityRole="button"
+              accessibilityLabel={t('home_btn_discover')}
+              accessibilityHint="Ouvre le catalogue des modules du programme."
             >
               <Text style={styles.buttonText}>{t('home_btn_discover')}</Text>
               <Text style={styles.buttonText}>→</Text>
@@ -94,8 +98,21 @@ export default function HomeScreen({ navigation }) {
             <Pressable
               style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
               onPress={() => navigation.navigate('Lulu')}
+              accessibilityRole="button"
+              accessibilityLabel="Parler à Lulu"
+              accessibilityHint="Ouvre l'assistant d'orientation vers les modules."
             >
               <Text style={styles.secondaryButtonText}>💬 {t('home_btn_lulu')}</Text>
+            </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
+              onPress={() => navigation.navigate('Channels')}
+              accessibilityRole="button"
+              accessibilityLabel={t('home_btn_channels')}
+              accessibilityHint={t('home_btn_channels_hint')}
+            >
+              <Text style={styles.secondaryButtonText}>📵 {t('home_btn_channels')}</Text>
             </Pressable>
           </Animated.View>
 
@@ -134,7 +151,7 @@ function getStyles(colors) {
     },
     badgeIcon: { fontSize: 30 },
     eyebrow: {
-      fontSize: 13, fontWeight: '600', color: colors.textSecondary,
+      fontSize: 13, fontWeight: '700', color: '#ffffff',
       textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6,
     },
     title: { fontSize: 40, fontWeight: '900', color: '#fff', letterSpacing: 0.5, marginBottom: 14 },

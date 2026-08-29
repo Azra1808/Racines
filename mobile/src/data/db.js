@@ -2,10 +2,12 @@ import * as SQLite from 'expo-sqlite';
 
 let dbInstance = null;
 
-async function getDb() {
-  if (!dbInstance) {
-    dbInstance = await SQLite.openDatabaseAsync('racines.db');
-    await dbInstance.execAsync(`
+async function initialiserBase(db) {
+  await db.execAsync('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;');
+
+  const version = await db.getFirstAsync('PRAGMA user_version;');
+  if ((version?.user_version ?? 0) < 1) {
+    await db.execAsync(`
       CREATE TABLE IF NOT EXISTS progression (
         module_id TEXT PRIMARY KEY NOT NULL,
         module_termine INTEGER NOT NULL DEFAULT 0,
@@ -13,7 +15,15 @@ async function getDb() {
         quiz_total INTEGER,
         derniere_maj TEXT NOT NULL
       );
+      PRAGMA user_version = 1;
     `);
+  }
+}
+
+async function getDb() {
+  if (!dbInstance) {
+    dbInstance = await SQLite.openDatabaseAsync('racines.db');
+    await initialiserBase(dbInstance);
   }
   return dbInstance;
 }

@@ -13,7 +13,13 @@ export default function ScreenHeader({ title, subtitle, onBack }) {
       <SafeAreaView edges={['top']}>
         <View style={styles.row}>
           {onBack && (
-            <Pressable onPress={onBack} style={styles.iconButton} hitSlop={12}>
+            <Pressable
+              onPress={onBack}
+              style={styles.iconButton}
+              hitSlop={12}
+              accessibilityRole="button"
+              accessibilityLabel="Revenir à l'écran précédent"
+            >
               <Text style={styles.backIcon}>←</Text>
             </Pressable>
           )}
@@ -27,6 +33,7 @@ export default function ScreenHeader({ title, subtitle, onBack }) {
             onPress={() => navigation.navigate('Accessibility')}
             style={styles.iconButton}
             hitSlop={12}
+            accessibilityRole="button"
             accessibilityLabel="Ouvrir les réglages d'accessibilité"
           >
             <Text style={styles.accessIcon}>⚙️</Text>

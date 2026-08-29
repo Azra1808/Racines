@@ -23,10 +23,13 @@ function AnimatedCard({ item, index, progressions, colors, onPress }) {
       <Pressable
         style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: colors.background === '#000000' ? 1 : 0 }]}
         onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={`${item.titre}, ${item.thematique}${progressions[item.id]?.module_termine ? ', terminé' : ''}`}
+        accessibilityHint="Ouvre le module et sa lecture audio."
         onPressIn={() => Animated.spring(scaleAnim, { toValue: 0.96, useNativeDriver: true }).start()}
         onPressOut={() => Animated.spring(scaleAnim, { toValue: 1, friction: 4, useNativeDriver: true }).start()}
       >
-        <View style={styles.iconWrap}>
+        <View style={[styles.iconWrap, { backgroundColor: colors.surfaceAlt }]}>
           <Text style={styles.icon}>{PICTO_EMOJI[item.pictogrammes[0]] ?? '📘'}</Text>
           {progressions[item.id]?.module_termine ? (
             <View style={styles.doneBadge}>
@@ -35,10 +38,10 @@ function AnimatedCard({ item, index, progressions, colors, onPress }) {
           ) : null}
         </View>
         <View style={styles.cardText}>
-          <Text style={styles.cardCategory}>{item.thematique}</Text>
-          <Text style={styles.cardTitle}>{item.titre}</Text>
+          <Text style={[styles.cardCategory, { color: colors.accent }]}>{item.thematique}</Text>
+          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>{item.titre}</Text>
         </View>
-        <Text style={styles.chevron}>›</Text>
+        <Text style={[styles.chevron, { color: colors.textMuted }]}>›</Text>
       </Pressable>
     </Animated.View>
   );
@@ -80,23 +83,23 @@ export default function CatalogScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f7f4ee' },
+  container: { flex: 1 },
   list: { padding: 16, paddingTop: 20 },
   card: {
-    flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff',
+    flexDirection: 'row', alignItems: 'center',
     borderRadius: 16, padding: 14, marginBottom: 12,
     shadowColor: '#1c2733', shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06, shadowRadius: 6, elevation: 2,
   },
   iconWrap: {
-    width: 48, height: 48, borderRadius: 14, backgroundColor: '#eef3ea',
+    width: 48, height: 48, borderRadius: 14,
     alignItems: 'center', justifyContent: 'center', marginRight: 14, position: 'relative',
   },
   icon: { fontSize: 24 },
   cardText: { flex: 1 },
-  cardCategory: { fontSize: 11, fontWeight: '700', color: '#c98a2e', textTransform: 'uppercase', marginBottom: 2 },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: '#1c2733' },
-  chevron: { fontSize: 22, color: '#c9c0ad', marginLeft: 8 },
+  cardCategory: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', marginBottom: 2 },
+  cardTitle: { fontSize: 16, fontWeight: '700' },
+  chevron: { fontSize: 22, marginLeft: 8 },
   doneBadge: {
     position: 'absolute', top: -4, right: -4,
     width: 20, height: 20, borderRadius: 10,
