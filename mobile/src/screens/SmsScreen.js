@@ -15,6 +15,7 @@ import {
   View, Text, StyleSheet, Pressable, ScrollView, Linking, Platform, Alert,
 } from 'react-native';
 import ScreenHeader from '../components/ScreenHeader';
+import UiIcon from '../components/icons/UiIcon';
 import { useTheme } from '../context/ThemeContext';
 import { MODULES } from '../data/modules';
 import { composerSms, nombreDeSms, lienSms, LIMITE_SMS } from '../data/smsCanal';
@@ -110,7 +111,8 @@ export default function SmsScreen({ navigation }) {
           accessibilityLabel={`Envoyer par SMS le conseil du module ${unite.titre}`}
           accessibilityHint="Ouvre la messagerie du téléphone avec le conseil déjà écrit."
         >
-          <Text style={styles.boutonTexte}>✉️  Envoyer ce conseil par SMS</Text>
+          <UiIcon name="mail" size={16} color={colors.accentText} />
+          <Text style={styles.boutonTexte}>Envoyer ce conseil par SMS</Text>
         </Pressable>
 
         {Platform.OS === 'web' && (
@@ -188,7 +190,8 @@ function getStyles(colors) {
 
     bouton: {
       marginTop: 16, backgroundColor: colors.accent,
-      paddingVertical: 15, borderRadius: 13, alignItems: 'center',
+      paddingVertical: 15, borderRadius: 13, flexDirection: 'row',
+      alignItems: 'center', justifyContent: 'center', gap: 8,
     },
     boutonPresse: { opacity: 0.85 },
     boutonTexte: { color: colors.accentText, fontWeight: '700', fontSize: 15 },

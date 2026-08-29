@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import ScreenHeader from '../components/ScreenHeader';
+import UiIcon from '../components/icons/UiIcon';
 import { useTheme } from '../context/ThemeContext';
 
 export default function AccessibilityScreen({ navigation }) {
@@ -23,11 +24,15 @@ export default function AccessibilityScreen({ navigation }) {
             Fond noir et texte en couleurs vives, pour une meilleure lisibilité.
           </Text>
           <Pressable
-            style={[styles.toggleRow, { backgroundColor: isHighContrast ? colors.accent : colors.surfaceAlt }]}
+            style={[styles.toggleRow, styles.toggleRowIconed, { backgroundColor: isHighContrast ? colors.accent : colors.surfaceAlt }]}
             onPress={toggleContrast}
+            accessibilityRole="switch"
+            accessibilityState={{ checked: isHighContrast }}
+            accessibilityLabel="Contraste élevé"
           >
+            <UiIcon name={isHighContrast ? 'sun' : 'moon'} size={18} color={isHighContrast ? colors.accentText : colors.textPrimary} />
             <Text style={[styles.toggleText, { color: isHighContrast ? colors.accentText : colors.textPrimary, fontSize: rf(15) }]}>
-              {isHighContrast ? '☀️  Désactiver le contraste élevé' : '🌓  Activer le contraste élevé'}
+              {isHighContrast ? 'Désactiver le contraste élevé' : 'Activer le contraste élevé'}
             </Text>
           </Pressable>
         </View>
@@ -49,6 +54,9 @@ export default function AccessibilityScreen({ navigation }) {
               style={[styles.stepperButton, fontScale <= fontScaleMin && styles.stepperButtonDisabled]}
               onPress={decreaseFontScale}
               disabled={fontScale <= fontScaleMin}
+              accessibilityRole="button"
+              accessibilityLabel="Réduire la taille du texte"
+              accessibilityState={{ disabled: fontScale <= fontScaleMin }}
             >
               <Text style={styles.stepperButtonText}>A−</Text>
             </Pressable>
@@ -61,13 +69,21 @@ export default function AccessibilityScreen({ navigation }) {
               style={[styles.stepperButton, fontScale >= fontScaleMax && styles.stepperButtonDisabled]}
               onPress={increaseFontScale}
               disabled={fontScale >= fontScaleMax}
+              accessibilityRole="button"
+              accessibilityLabel="Augmenter la taille du texte"
+              accessibilityState={{ disabled: fontScale >= fontScaleMax }}
             >
               <Text style={styles.stepperButtonText}>A+</Text>
             </Pressable>
           </View>
 
           {fontScale !== 1 && (
-            <Pressable style={styles.resetButton} onPress={resetFontScale}>
+            <Pressable
+              style={styles.resetButton}
+              onPress={resetFontScale}
+              accessibilityRole="button"
+              accessibilityLabel="Réinitialiser la taille du texte"
+            >
               <Text style={[styles.resetButtonText, { fontSize: rf(13) }]}>Réinitialiser la taille</Text>
             </Pressable>
           )}
@@ -80,12 +96,16 @@ export default function AccessibilityScreen({ navigation }) {
             plus facile à suivre.
           </Text>
           <Pressable
-            style={[styles.toggleRow, { backgroundColor: isSimplifiedMode ? colors.accent : colors.surfaceAlt }]}
+            style={[styles.toggleRow, styles.toggleRowIconed, { backgroundColor: isSimplifiedMode ? colors.accent : colors.surfaceAlt }]}
             onPress={toggleSimplifiedMode}
+            accessibilityRole="switch"
+            accessibilityState={{ checked: isSimplifiedMode }}
+            accessibilityLabel="Mode lecture simplifiée"
           >
+            <UiIcon name={isSimplifiedMode ? 'checkFilled' : 'image'} size={18} color={isSimplifiedMode ? colors.accentText : colors.textPrimary} />
             <Text style={[styles.toggleText, { color: isSimplifiedMode ? colors.accentText : colors.textPrimary, fontSize: rf(15) }]}>
-              {isSimplifiedMode ? '✓  Mode simplifié activé' : '🖼️  Activer le mode simplifié'}
-              </Text>
+              {isSimplifiedMode ? 'Mode simplifié activé' : 'Activer le mode simplifié'}
+            </Text>
           </Pressable>
         </View>
 
@@ -105,6 +125,7 @@ function getStyles(colors) {
     cardTitle: { fontWeight: '800', color: colors.textPrimary, marginBottom: 6 },
     cardDescription: { color: colors.textSecondary, lineHeight: 20, marginBottom: 16 },
     toggleRow: { borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
+    toggleRowIconed: { flexDirection: 'row', justifyContent: 'center', gap: 8 },
     toggleText: { fontWeight: '700' },
     previewBox: {
       backgroundColor: colors.surfaceAlt, borderRadius: 12, padding: 14, marginBottom: 16,

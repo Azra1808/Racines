@@ -3,6 +3,7 @@ import {
   View, Text, StyleSheet, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platform,
 } from 'react-native';
 import ScreenHeader from '../components/ScreenHeader';
+import UiIcon from '../components/icons/UiIcon';
 import { MODULES } from '../data/modules';
 import { trouverReponse, LULU_FALLBACK } from '../data/luluResponses';
 import { useTheme } from '../context/ThemeContext';
@@ -132,7 +133,11 @@ export default function LuluScreen({ navigation }) {
             accessibilityHint="Lulu vous orientera vers un module approprié ou vers une aide urgente si nécessaire."
             accessibilityState={{ disabled: enAttente }}
           >
-            <Text style={styles.sendButtonText}>{enAttente ? '…' : '➤'}</Text>
+            {enAttente ? (
+              <Text style={styles.sendButtonText}>…</Text>
+            ) : (
+              <UiIcon name="send" size={17} color={colors.accentText} />
+            )}
           </Pressable>
         </View>
       </KeyboardAvoidingView>
@@ -160,7 +165,6 @@ function getStyles(colors) {
     suggestionTitle: { fontSize: 13, fontWeight: '700', color: colors.textPrimary, marginBottom: 4 },
     suggestionSource: { fontSize: 11, color: colors.textSecondary, marginBottom: 4 },
     suggestionArrow: { fontSize: 12, color: colors.accent, fontWeight: '600' },
-    sourceText: { fontSize: 11, color: colors.textMuted, marginTop: 6, fontStyle: 'italic' },
     inputRow: {
       flexDirection: 'row', alignItems: 'center', padding: 12, gap: 8,
       borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.background,

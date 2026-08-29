@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
+import UiIcon from './icons/UiIcon';
 
 export default function ScreenHeader({ title, subtitle, onBack }) {
   const { colors, rf } = useTheme();
@@ -20,7 +21,7 @@ export default function ScreenHeader({ title, subtitle, onBack }) {
               accessibilityRole="button"
               accessibilityLabel="Revenir à l'écran précédent"
             >
-              <Text style={styles.backIcon}>←</Text>
+              <UiIcon name="arrowLeft" size={19} color="#ffffff" />
             </Pressable>
           )}
           <View style={styles.textWrap}>
@@ -36,7 +37,7 @@ export default function ScreenHeader({ title, subtitle, onBack }) {
             accessibilityRole="button"
             accessibilityLabel="Ouvrir les réglages d'accessibilité"
           >
-            <Text style={styles.accessIcon}>⚙️</Text>
+            <UiIcon name="settings" size={17} color="#ffffff" />
           </Pressable>
         </View>
       </SafeAreaView>
@@ -51,8 +52,6 @@ const styles = StyleSheet.create({
     width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.15)',
     alignItems: 'center', justifyContent: 'center',
   },
-  backIcon: { color: '#fff', fontSize: 20, fontWeight: '700' },
-  accessIcon: { fontSize: 17 },
   textWrap: { flex: 1, marginHorizontal: 10 },
   title: { color: '#fff', fontWeight: '800' },
   subtitle: { color: 'rgba(255,255,255,0.75)', marginTop: 2 },
