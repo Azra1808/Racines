@@ -106,6 +106,16 @@ export default function HomeScreen({ navigation }) {
             >
               <Text style={styles.secondaryButtonText}>💬 Parler à Lulu</Text>
             </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
+              onPress={() => navigation.navigate('Ussd')}
+              accessibilityRole="button"
+              accessibilityLabel="Voir le canal USSD"
+              accessibilityHint="Montre le parcours accessible depuis un téléphone basique, sans internet."
+            >
+              <Text style={styles.secondaryButtonText}>📵 Sans internet — USSD</Text>
+            </Pressable>
           </Animated.View>
 
           <Text style={styles.footer}>Contenus issus du guide officiel UNICEF Cameroun</Text>
