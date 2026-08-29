@@ -109,12 +109,12 @@ export default function HomeScreen({ navigation }) {
 
             <Pressable
               style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
-              onPress={() => navigation.navigate('Ussd')}
+              onPress={() => navigation.navigate('Channels')}
               accessibilityRole="button"
-              accessibilityLabel="Voir le canal USSD"
-              accessibilityHint="Montre le parcours accessible depuis un téléphone basique, sans internet."
+              accessibilityLabel="Voir les cinq canaux"
+              accessibilityHint="Montre le même contenu rendu pour l'application, le SMS, l'USSD, le vocal et la lecture simplifiée."
             >
-              <Text style={styles.secondaryButtonText}>📵 Sans internet — USSD</Text>
+              <Text style={styles.secondaryButtonText}>📵 Sans internet — 5 canaux</Text>
             </Pressable>
           </Animated.View>
 

@@ -7,6 +7,8 @@ import QuizScreen from '../screens/QuizScreen';
 import LuluScreen from '../screens/LuluScreen';
 import AccessibilityScreen from '../screens/AccessibilityScreen';
 import UssdScreen from '../screens/UssdScreen';
+import IvrScreen from '../screens/IvrScreen';
+import ChannelsScreen from '../screens/ChannelsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +23,8 @@ export default function AppNavigator() {
         <Stack.Screen name="Lulu" component={LuluScreen} />
         <Stack.Screen name="Accessibility" component={AccessibilityScreen} />
         <Stack.Screen name="Ussd" component={UssdScreen} />
+        <Stack.Screen name="Ivr" component={IvrScreen} />
+        <Stack.Screen name="Channels" component={ChannelsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
