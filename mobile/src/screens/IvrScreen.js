@@ -12,6 +12,7 @@ import { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import * as Speech from 'expo-speech';
 import ScreenHeader from '../components/ScreenHeader';
+import UiIcon from '../components/icons/UiIcon';
 import { useTheme } from '../context/ThemeContext';
 import { NUMERO_VOCAL, LANGUES, resoudreEtapeIvr } from '../data/ivrMenu';
 
@@ -142,7 +143,8 @@ export default function IvrScreen({ navigation }) {
                 accessibilityRole="button"
                 accessibilityLabel={`Appeler le ${NUMERO_VOCAL}`}
               >
-                <Text style={styles.actionPrimaryText}>📞 Appeler</Text>
+                <UiIcon name="call" size={15} color={colors.accentText} />
+                <Text style={styles.actionPrimaryText}>Appeler</Text>
               </Pressable>
             ) : (
               <Pressable
@@ -244,7 +246,10 @@ function getStyles(colors) {
     keyText: { fontWeight: '700', color: colors.textPrimary },
 
     actionRow: { flexDirection: 'row', marginTop: 14 },
-    action: { flex: 1, paddingVertical: 13, borderRadius: 12, alignItems: 'center' },
+    action: {
+      flex: 1, paddingVertical: 13, borderRadius: 12,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7,
+    },
     actionPrimary: { backgroundColor: colors.accent },
     actionPrimaryText: { color: colors.accentText, fontWeight: '700', fontSize: 15 },
     actionDanger: { backgroundColor: colors.danger },

@@ -3,8 +3,6 @@
     "name": "RACINES",
     "slug": "racines",
     "version": "1.0.0",
-    "description": "Des conseils parentaux simples, fiables et accessibles hors connexion.",
-    "scheme": "racines",
     "orientation": "portrait",
     "icon": "./assets/IconOfficielle.jpeg",
     "userInterfaceStyle": "light",
@@ -13,7 +11,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#F7F2E8",
+        "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png",
@@ -31,6 +29,8 @@
       "eas": {
         "projectId": "4b6b66da-504b-4e32-ab7e-62e962bf9e40"
       }
-    }
+    },
+    "description": "Des conseils parentaux simples, fiables et accessibles hors connexion.",
+    "scheme": "racines"
   }
 }

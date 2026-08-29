@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import ScreenHeader from '../components/ScreenHeader';
+import UiIcon from '../components/icons/UiIcon';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -32,12 +33,19 @@ export default function ParametresScreen({ navigation }) {
                     { borderColor: selected ? theme.swatch : colors.border, borderWidth: selected ? 3 : 1 },
                   ]}
                   onPress={() => setTheme(theme.id)}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected }}
+                  accessibilityLabel={`Thème ${theme.label}`}
                 >
                   <View style={[styles.swatch, { backgroundColor: theme.swatch }]} />
                   <Text style={[styles.themeLabel, { color: colors.textPrimary, fontSize: rf(13) }]}>
                     {theme.label}
                   </Text>
-                  {selected && <Text style={styles.checkMark}>✓</Text>}
+                  {selected && (
+                    <View style={styles.checkMark}>
+                      <UiIcon name="checkFilled" size={16} color={colors.accent} />
+                    </View>
+                  )}
                 </Pressable>
               );
             })}
@@ -59,8 +67,25 @@ export default function ParametresScreen({ navigation }) {
                     { backgroundColor: selected ? colors.accent : colors.surfaceAlt },
                   ]}
                   onPress={() => setLangue(langue.id)}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected }}
+                  accessibilityLabel={langue.label}
                 >
-                  <Text style={styles.languageFlag}>{langue.drapeau}</Text>
+                  <View
+                    style={[
+                      styles.languageBadge,
+                      { backgroundColor: selected ? 'rgba(255,255,255,0.25)' : colors.background },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.languageBadgeText,
+                        { color: selected ? colors.accentText : colors.textSecondary },
+                      ]}
+                    >
+                      {langue.code}
+                    </Text>
+                  </View>
                   <Text
                     style={[
                       styles.languageLabel,
@@ -69,16 +94,19 @@ export default function ParametresScreen({ navigation }) {
                   >
                     {langue.label}
                   </Text>
-                  {selected && (
-                    <Text style={[styles.languageCheck, { color: colors.accentText }]}>✓</Text>
-                  )}
+                  {selected && <UiIcon name="checkFilled" size={18} color={colors.accentText} />}
                 </Pressable>
               );
             })}
           </View>
         </View>
 
-        <Pressable style={styles.linkRow} onPress={() => navigation.navigate('Accessibility')}>
+        <Pressable
+          style={styles.linkRow}
+          onPress={() => navigation.navigate('Accessibility')}
+          accessibilityRole="button"
+          accessibilityLabel={t('settings_accessibility_link')}
+        >
           <Text style={[styles.linkText, { color: colors.accent, fontSize: rf(15) }]}>
             {t('settings_accessibility_link')}
           </Text>
@@ -106,15 +134,18 @@ function getStyles(colors) {
     },
     swatch: { width: 36, height: 36, borderRadius: 18, marginBottom: 8 },
     themeLabel: { fontWeight: '700' },
-    checkMark: { position: 'absolute', top: 8, right: 10, fontWeight: '900', color: colors.accent },
+    checkMark: { position: 'absolute', top: 8, right: 10 },
     languageList: { gap: 10 },
     languageRow: {
       flexDirection: 'row', alignItems: 'center', borderRadius: 12,
       paddingVertical: 12, paddingHorizontal: 14, gap: 10,
     },
-    languageFlag: { fontSize: 18 },
+    languageBadge: {
+      width: 30, height: 30, borderRadius: 9,
+      alignItems: 'center', justifyContent: 'center',
+    },
+    languageBadgeText: { fontSize: 11, fontWeight: '800' },
     languageLabel: { fontWeight: '700', flex: 1 },
-    languageCheck: { fontWeight: '900' },
     linkRow: { alignItems: 'center', paddingVertical: 10 },
     linkText: { fontWeight: '700' },
   });

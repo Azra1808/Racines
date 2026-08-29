@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useMemo } from 'react';
 
-// ⚠️ IMPORTANT — à lire avant d'enregistrer la vidéo de démonstration :
+// IMPORTANT — à lire avant d'enregistrer la vidéo de démonstration :
 // Le français et l'anglais ci-dessous sont fiables. L'ewondo et le bassa
 // sont une TRADUCTION DE MEILLEUR EFFORT, non validée par un locuteur natif
 // (exactement le risque que le plan d'action identifie lui-même : "Aucune
@@ -12,11 +12,13 @@ import { createContext, useContext, useState, useMemo } from 'react';
 // LANGUE soit fonctionnel à l'écran — le contenu des modules (audio, texte
 // enrichi) reste uniquement en français pour le MVP.
 
+// « code » remplace l'ancien drapeau emoji : un badge texte à deux ou trois
+// lettres, rendu par un composant SVG (voir ParametresScreen).
 export const LANGUES = [
-  { id: 'fr', label: 'Français', drapeau: '🇫🇷' },
-  { id: 'en', label: 'English', drapeau: '🇬🇧' },
-  { id: 'ewo', label: 'Ewondo', drapeau: '🌿' },
-  { id: 'bas', label: 'Bassa', drapeau: '🌿' },
+  { id: 'fr', label: 'Français', code: 'FR' },
+  { id: 'en', label: 'English', code: 'EN' },
+  { id: 'ewo', label: 'Ewondo', code: 'EW' },
+  { id: 'bas', label: 'Bassa', code: 'BA' },
 ];
 
 const TRADUCTIONS = {
@@ -26,10 +28,11 @@ const TRADUCTIONS = {
     home_feature_offline: 'Hors connexion',
     home_feature_audio: 'Lecture audio',
     home_feature_modules: '10 modules',
+    home_feature_modules_suffix: 'modules',
     home_btn_discover: 'Découvrir les modules',
     home_btn_lulu: 'Parler à Lulu',
     home_btn_channels: 'Sans internet — 5 canaux',
-    home_btn_channels_hint: 'Montre le même contenu rendu pour l\'application, le SMS, l\'USSD, le vocal et la lecture simplifiée.',
+    home_btn_channels_hint: 'Montre le même contenu rendu pour le SMS, l\'USSD et le vocal.',
     home_footer: 'Contenus issus du guide officiel UNICEF Cameroun',
     nav_settings: 'Paramètres',
     nav_accessibility: 'Accessibilité',
@@ -41,7 +44,7 @@ const TRADUCTIONS = {
     settings_language_title: 'Langue',
     settings_language_subtitle: 'Choisissez la langue de l\'interface',
     settings_accessibility_link: 'Réglages d\'accessibilité →',
-    lulu_greeting: 'Bonjour, je suis Lulu 🌱 Posez-moi une question sur votre enfant, je vous orienterai vers le bon module.',
+    lulu_greeting: 'Bonjour, je suis Lulu. Posez-moi une question sur votre enfant, je vous orienterai vers le bon module.',
     lulu_placeholder: 'Écrivez votre question...',
     lulu_source: 'Source',
     common_open_module: 'Ouvrir le module',
@@ -54,10 +57,11 @@ const TRADUCTIONS = {
     home_feature_offline: 'Offline',
     home_feature_audio: 'Audio playback',
     home_feature_modules: '10 modules',
+    home_feature_modules_suffix: 'modules',
     home_btn_discover: 'Explore the modules',
     home_btn_lulu: 'Talk to Lulu',
     home_btn_channels: 'No internet — 5 channels',
-    home_btn_channels_hint: 'Shows the same content rendered for the app, SMS, USSD, voice and simplified reading.',
+    home_btn_channels_hint: 'Shows the same content rendered for SMS, USSD and voice.',
     home_footer: 'Content from the official UNICEF Cameroon guide',
     nav_settings: 'Settings',
     nav_accessibility: 'Accessibility',
@@ -69,7 +73,7 @@ const TRADUCTIONS = {
     settings_language_title: 'Language',
     settings_language_subtitle: 'Choose the interface language',
     settings_accessibility_link: 'Accessibility settings →',
-    lulu_greeting: 'Hello, I\'m Lulu 🌱 Ask me anything about your child and I\'ll point you to the right module.',
+    lulu_greeting: 'Hello, I\'m Lulu. Ask me anything about your child and I\'ll point you to the right module.',
     lulu_placeholder: 'Type your question...',
     lulu_source: 'Source',
     common_open_module: 'Open module',
@@ -84,6 +88,7 @@ const TRADUCTIONS = {
     home_feature_offline: 'Si internet te',
     home_feature_audio: 'Wôk ki elañ',
     home_feature_modules: 'Bikalate 10',
+    home_feature_modules_suffix: 'bikalate',
     home_btn_discover: 'Yen bikalate',
     home_btn_lulu: 'Kobô na Lulu',
     home_footer: 'Melebe ma so UNICEF Cameroun',
@@ -97,7 +102,7 @@ const TRADUCTIONS = {
     settings_language_title: 'Ayôñ',
     settings_language_subtitle: 'Pô ayôñ a app',
     settings_accessibility_link: 'Ngamba asu bôt bese →',
-    lulu_greeting: 'Mbolô, ma ne Lulu 🌱 Sili ma jam d\'ayoñ mon wo, ma ye lem wo bikalate.',
+    lulu_greeting: 'Mbolô, ma ne Lulu. Sili ma jam d\'ayoñ mon wo, ma ye lem wo bikalate.',
     lulu_placeholder: 'Tila jam wo...',
     lulu_source: 'Ayale',
     common_open_module: 'Fulu bikalate',
@@ -112,6 +117,7 @@ const TRADUCTIONS = {
     home_feature_offline: 'Ndi internet te',
     home_feature_audio: 'Séŋgi i wôk',
     home_feature_modules: 'Bikalati 10',
+    home_feature_modules_suffix: 'bikalati',
     home_btn_discover: 'Yen bikalati',
     home_btn_lulu: 'Kobol ni Lulu',
     home_footer: 'Manyaka ma UNICEF Cameroun',
@@ -125,7 +131,7 @@ const TRADUCTIONS = {
     settings_language_title: 'Hilongi',
     settings_language_subtitle: 'Pô hilongi i app',
     settings_accessibility_link: 'Ngiimba asu bôt bese →',
-    lulu_greeting: 'Mbôlô, mba nde Lulu 🌱 Sili mba jam ni mon wo, mba we lem wo bikalati.',
+    lulu_greeting: 'Mbôlô, mba nde Lulu. Sili mba jam ni mon wo, mba we lem wo bikalati.',
     lulu_placeholder: 'Tila jam wo...',
     lulu_source: 'Nlombô',
     common_open_module: 'Fulu bikalati',

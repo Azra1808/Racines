@@ -2,18 +2,24 @@
 //
 // Ce n'est pas une page marketing : chaque encadré affiche le rendu réel,
 // calculé en direct depuis la même unité pédagogique. Changez de module en
-// haut, les cinq rendus changent ensemble. C'est la preuve, en un écran, que
-// le contenu n'est écrit qu'une fois et que chaque canal n'est qu'un
+// haut, les cinq rendus changent ensemble. C'est la preuve, en un écran,
+// que le contenu n'est écrit qu'une fois et que chaque canal n'est qu'un
 // adaptateur (dossier §5.1).
 //
+// Les quatre premières portes s'ouvrent : chaque encadré mène vers son
+// propre simulateur. La cinquième, la lecture simplifiée, montre son rendu
+// directement — les pictogrammes affichés SONT la démonstration.
+//
 // C'est aussi la réponse visuelle au critère « Replicabilité » : ajouter un
-// canal, c'est ajouter un encadré ici — pas réécrire huit modules.
+// canal, c'est ajouter un encadré ici — pas réécrire les modules.
 
 import { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import ScreenHeader from '../components/ScreenHeader';
+import UiIcon from '../components/icons/UiIcon';
+import PictoIcon from '../components/icons/PictoIcon';
 import { useTheme } from '../context/ThemeContext';
-import { MODULES, PICTO_EMOJI } from '../data/modules';
+import { MODULES } from '../data/modules';
 import { resoudreEcranUssd, LIMITE_CARACTERES_USSD, sansAccents } from '../data/ussdMenu';
 
 const LIMITE_SMS = 160;
@@ -40,7 +46,8 @@ export default function ChannelsScreen({ navigation }) {
         <Text style={[styles.intro, { fontSize: rf(13) }]}>
           Le contenu est écrit <Text style={styles.fort}>une seule fois</Text>.
           Chaque canal en sélectionne les champs dont il a besoin. Changez de
-          module : les cinq rendus ci-dessous changent ensemble.
+          module : les cinq rendus ci-dessous changent ensemble. Touchez un
+          encadré pour ouvrir le canal correspondant.
         </Text>
 
         {/* --- Sélecteur de module --- */}
@@ -72,42 +79,55 @@ export default function ChannelsScreen({ navigation }) {
           </Text>
         </View>
 
-        {rendus.map((rendu) => (
-          <View key={rendu.canal} style={styles.carte}>
-            <View style={styles.carteEntete}>
-              <Text style={[styles.carteIcone, { fontSize: rf(17) }]}>{rendu.icone}</Text>
-              <View style={styles.carteTitres}>
-                <Text style={[styles.carteCanal, { fontSize: rf(14) }]}>{rendu.canal}</Text>
-                <Text style={[styles.carteChamp, { fontSize: rf(10) }]}>{rendu.champ}</Text>
-              </View>
-              <Text style={[styles.carteMesure, { fontSize: rf(10) }]}>{rendu.mesure}</Text>
-            </View>
+        {rendus.map((rendu) => {
+          // Une carte qui mène quelque part est un bouton ; celle qui montre
+          // simplement son rendu n'en est pas un. On ne met donc la flèche
+          // que là où il y a réellement quelque chose à ouvrir.
+          const Conteneur = rendu.action ? Pressable : View;
+          const proprietesAction = rendu.action
+            ? {
+                onPress: () => navigation.navigate(rendu.action.route, rendu.action.params),
+                accessibilityRole: 'button',
+                accessibilityLabel: rendu.action.libelle,
+                style: ({ pressed }) => [styles.carte, pressed && styles.cartePressed],
+              }
+            : { style: styles.carte };
 
-            {rendu.pictos ? (
-              <View style={styles.pictoRangee}>
-                {rendu.pictos.map((picto) => (
-                  <View key={picto} style={styles.picto}>
-                    <Text style={{ fontSize: rf(24) }}>{PICTO_EMOJI[picto] ?? '•'}</Text>
-                    <Text style={[styles.pictoNom, { fontSize: rf(9) }]}>{picto}</Text>
-                  </View>
-                ))}
+          return (
+            <Conteneur key={rendu.canal} {...proprietesAction}>
+              <View style={styles.carteEntete}>
+                <View style={styles.carteIconeWrap}>
+                  <UiIcon name={rendu.icone} size={18} color={colors.accent} />
+                </View>
+                <View style={styles.carteTitres}>
+                  <Text style={[styles.carteCanal, { fontSize: rf(14) }]}>{rendu.canal}</Text>
+                  <Text style={[styles.carteChamp, { fontSize: rf(10) }]}>{rendu.champ}</Text>
+                </View>
+                <Text style={[styles.carteMesure, { fontSize: rf(10) }]}>{rendu.mesure}</Text>
               </View>
-            ) : (
-              <Text style={[styles.carteTexte, { fontSize: rf(12) }]}>{rendu.texte}</Text>
-            )}
 
-            {rendu.action && (
-              <Pressable
-                style={styles.carteAction}
-                onPress={() => navigation.navigate(rendu.action.route)}
-                accessibilityRole="button"
-                accessibilityLabel={rendu.action.libelle}
-              >
-                <Text style={styles.carteActionTexte}>{rendu.action.libelle} →</Text>
-              </Pressable>
-            )}
-          </View>
-        ))}
+              {rendu.pictos ? (
+                <View style={styles.pictoRangee}>
+                  {rendu.pictos.map((picto) => (
+                    <View key={picto} style={styles.picto}>
+                      <PictoIcon name={picto} size={rf(26)} color={colors.textPrimary} />
+                      <Text style={[styles.pictoNom, { fontSize: rf(9) }]}>{picto}</Text>
+                    </View>
+                  ))}
+                </View>
+              ) : (
+                <Text style={[styles.carteTexte, { fontSize: rf(12) }]}>{rendu.texte}</Text>
+              )}
+
+              {rendu.action && (
+                <View style={styles.carteAction}>
+                  <Text style={styles.carteActionTexte}>{rendu.action.libelle}</Text>
+                  <UiIcon name="arrowRight" size={14} color={colors.accent} />
+                </View>
+              )}
+            </Conteneur>
+          );
+        })}
 
         <View style={styles.conclusion}>
           <Text style={[styles.conclusionTexte, { fontSize: rf(12) }]}>
@@ -130,14 +150,15 @@ function construireRendus(unite) {
     {
       canal: 'Application',
       champ: 'corpsApp',
-      icone: '📱',
+      icone: 'book',
       mesure: `${unite.corpsApp.length} car.`,
       texte: `${unite.corpsApp.slice(0, 220).trimEnd()}…`,
+      action: { route: 'Module', params: { moduleId: unite.id }, libelle: 'Lire le module complet' },
     },
     {
       canal: 'SMS',
       champ: 'resumeSms',
-      icone: '💬',
+      icone: 'mail',
       mesure: `${unite.resumeSms.length}/${LIMITE_SMS}`,
       texte: unite.resumeSms,
       action: { route: 'Sms', libelle: 'Envoyer un conseil par SMS' },
@@ -145,7 +166,7 @@ function construireRendus(unite) {
     {
       canal: 'USSD',
       champ: 'resumeSms → écran 182 car.',
-      icone: '📵',
+      icone: 'noSignal',
       mesure: `${ecranUssd.length}/${LIMITE_CARACTERES_USSD}`,
       texte: ecranUssd,
       action: { route: 'Ussd', libelle: 'Ouvrir le simulateur USSD' },
@@ -153,15 +174,18 @@ function construireRendus(unite) {
     {
       canal: 'Vocal (IVR)',
       champ: 'scriptAudioIvr',
-      icone: '📞',
+      icone: 'call',
       mesure: `~${secondes} s`,
       texte: unite.scriptAudioIvr,
       action: { route: 'Ivr', libelle: 'Écouter le parcours vocal' },
     },
     {
+      // Cinquième porte : la lecture simplifiée, pour un parent qui ne lit
+      // pas. Elle n'ouvre pas de simulateur — le rendu EST la démonstration,
+      // on voit les pictogrammes réels de l'unité.
       canal: 'Lecture simplifiée',
       champ: 'pictogrammes',
-      icone: '🖼️',
+      icone: 'image',
       mesure: `${unite.pictogrammes.length} pictos`,
       pictos: unite.pictogrammes,
     },
@@ -208,8 +232,13 @@ function getStyles(colors) {
       borderLeftWidth: 4,
       borderLeftColor: colors.accent,
     },
+    cartePressed: { opacity: 0.85 },
     carteEntete: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
-    carteIcone: {},
+    carteIconeWrap: {
+      width: 32, height: 32, borderRadius: 9,
+      alignItems: 'center', justifyContent: 'center',
+      backgroundColor: colors.surfaceAlt,
+    },
     carteTitres: { flex: 1 },
     carteCanal: { fontWeight: '800', color: colors.textPrimary },
     carteChamp: { color: colors.textMuted, marginTop: 1 },
@@ -221,10 +250,12 @@ function getStyles(colors) {
     carteTexte: { color: colors.textSecondary, lineHeight: 18 },
 
     pictoRangee: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-    picto: { alignItems: 'center', width: 66 },
-    pictoNom: { color: colors.textMuted, textAlign: 'center', marginTop: 3 },
+    picto: { alignItems: 'center', width: 72 },
+    pictoNom: { color: colors.textMuted, textAlign: 'center', marginTop: 4 },
 
-    carteAction: { marginTop: 10 },
+    carteAction: {
+      marginTop: 10, flexDirection: 'row', alignItems: 'center', gap: 6,
+    },
     carteActionTexte: { color: colors.accent, fontWeight: '700', fontSize: 13 },
 
     conclusion: {
