@@ -87,7 +87,9 @@ export default function LuluScreen({ navigation }) {
                 <Text style={item.auteur === 'utilisateur' ? styles.bubbleTextUser : styles.bubbleTextLulu}>
                   {item.texte}
                 </Text>
-                {item.source && (
+                {/* La source n'apparaît qu'une fois : portée par la carte du
+                    module quand il y en a une, sinon affichée seule. */}
+                {item.source && !item.moduleSuggere && (
                   <Text style={styles.sourceText}>{t('lulu_source')} : {item.source}</Text>
                 )}
                 {item.moduleSuggere && (
