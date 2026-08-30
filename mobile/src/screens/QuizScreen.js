@@ -24,6 +24,7 @@ export default function QuizScreen({ route, navigation }) {
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
+  const [saveError, setSaveError] = useState(false);
 
   const styles = getStyles(colors);
 
@@ -45,23 +46,32 @@ export default function QuizScreen({ route, navigation }) {
     if (index === question.correctIndex) setScore((s) => s + 1);
   }
 
-  function handleNext() {
-    const justScored = selected === question.correctIndex;
+  async function handleNext() {
     if (currentIndex + 1 < questions.length) {
       setCurrentIndex((i) => i + 1);
       setSelected(null);
       setAnswered(false);
-    } else {
-      const total = questions.length;
-      const finalS = score + (justScored ? 1 : 0);
-      setFinalScore(finalS);
-      setFinished(true);
-      if (isBilan) {
-        enregistrerScoreBilan(module.id, finalS, total);
-      } else {
-        marquerSousModuleTermine(module.id, sousModuleIndex, finalS, total);
-      }
+      return;
     }
+
+    const total = questions.length;
+    // score contient déjà la dernière réponse (mise à jour dans
+    // handleSelect au clic précédent) : ne jamais la rajouter une seconde
+    // fois ici, sinon un score parfait affiche 6/5 au lieu de 5/5.
+    const finalS = score;
+    setFinalScore(finalS);
+
+    try {
+      if (isBilan) {
+        await enregistrerScoreBilan(module.id, finalS, total);
+      } else {
+        await marquerSousModuleTermine(module.id, sousModuleIndex, finalS, total);
+      }
+    } catch (e) {
+      console.error('Échec enregistrement progression :', e);
+      setSaveError(true);
+    }
+    setFinished(true);
   }
 
   function goToModule() {
@@ -93,6 +103,12 @@ export default function QuizScreen({ route, navigation }) {
             {isBilan ? t('quiz_bilan_done') : t('quiz_part_done', { n: sousModuleIndex + 1 })}
           </Text>
           <Text style={styles.resultScore}>{finalScore} / {questions.length} bonnes réponses</Text>
+
+          {saveError && (
+            <Text style={styles.saveErrorText}>
+              Ta progression n'a pas pu être enregistrée. Réessaie ce {isBilan ? 'bilan' : 'sous-module'}.
+            </Text>
+          )}
 
           {!isBilan && isLastSousModule && (
             <Pressable
@@ -214,5 +230,6 @@ function getStyles(colors) {
     },
     resultTitle: { fontSize: 22, fontWeight: '800', color: colors.textPrimary, marginBottom: 8, textAlign: 'center' },
     resultScore: { fontSize: 17, color: colors.textSecondary, marginBottom: 24 },
+    saveErrorText: { fontSize: 13, color: colors.danger, marginBottom: 16, textAlign: 'center' },
   });
 }
