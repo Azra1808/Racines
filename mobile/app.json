@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "RACINES",
-    "slug": "racines",
+    "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/IconOfficielle.jpeg",
@@ -11,8 +11,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundColor": "#1c6b3f",
+        "foregroundImage": "./assets/IconOfficielle.jpeg",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png",
         "softwareKeyboardLayoutMode": "resize"
