@@ -8,6 +8,9 @@ import { MODULES } from '../data/modules';
 import { trouverReponse, LULU_FALLBACK } from '../data/luluResponses';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
+import * as Speech from 'expo-speech';
+import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
+import Svg, { Path } from 'react-native-svg';
 
 // Lulu répond entièrement depuis le téléphone : aucune requête réseau, donc
 // aucune latence et aucun écran bloqué, y compris en mode avion.
@@ -17,6 +20,15 @@ import { useLanguage } from '../context/LanguageContext';
 // d'incubation. Pour la démonstration, la règle du plan s'applique : ne
 // dépendre d'aucun service qui peut se mettre en veille pendant le pitch.
 
+function MicIcon({ color, size = 17 }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z" stroke={color} strokeWidth={1.7} />
+      <Path d="M6 11a6 6 0 0 0 12 0M12 19v2" stroke={color} strokeWidth={1.7} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
 export default function LuluScreen({ navigation }) {
   const { colors } = useTheme();
   const { t } = useLanguage();
@@ -25,6 +37,27 @@ export default function LuluScreen({ navigation }) {
   ]);
   const [saisie, setSaisie] = useState('');
   const [enAttente, setEnAttente] = useState(false);
+  const [ecoute, setEcoute] = useState(false);
+  useSpeechRecognitionEvent('result', (event) => {
+    const texte = event.results[0]?.transcript;
+    if (texte) setSaisie(texte);
+  });
+  useSpeechRecognitionEvent('end', () => setEcoute(false));
+  useSpeechRecognitionEvent('error', () => setEcoute(false));
+
+  function basculerEcoute() {
+    if (ecoute) {
+      ExpoSpeechRecognitionModule.stop();
+      setEcoute(false);
+      return;
+    }
+    ExpoSpeechRecognitionModule.requestPermissionsAsync().then((result) => {
+      if (result.granted) {
+        ExpoSpeechRecognitionModule.start({ lang: 'fr-FR', continuous: false });
+        setEcoute(true);
+      }
+    });
+  }
   const listRef = useRef(null);
 
   const styles = getStyles(colors);
@@ -34,36 +67,31 @@ export default function LuluScreen({ navigation }) {
   }
 
   function envoyerMessage() {
-    const texte = saisie.trim();
-    if (!texte || enAttente) return;
+  const texte = saisie.trim();
+  if (!texte || enAttente) return;
 
-    const messageUtilisateur = { id: `u-${Date.now()}`, auteur: 'utilisateur', texte };
-    setMessages((prev) => [...prev, messageUtilisateur]);
-    setSaisie('');
-    setEnAttente(true);
-    scrollVersLeBas();
+  const messageUtilisateur = { id: `u-${Date.now()}`, auteur: 'utilisateur', texte };
+  setMessages((prev) => [...prev, messageUtilisateur]);
+  setSaisie('');
+  scrollVersLeBas();
 
-    const regle = trouverReponse(texte);
-    const module = regle ? MODULES.find((m) => m.id === regle.moduleId) : null;
-    // Un signal d'urgence n'oriente pas vers un module : il oriente vers un
-    // humain. On n'affiche donc aucune suggestion de lecture dans ce cas.
-    const estUrgent = regle?.type === 'urgence';
+  const regle = trouverReponse(texte);
+  const module = regle ? MODULES.find((m) => m.id === regle.moduleId) : null;
+  const estUrgent = regle?.type === 'urgence';
 
-    const messageLulu = {
-      id: `l-${Date.now()}`,
-      auteur: 'lulu',
-      texte: regle ? regle.reponse : LULU_FALLBACK,
-      moduleSuggere: estUrgent ? null : module,
-      estUrgent,
-      // Citation de la vraie référence du guide officiel (déjà présente
-      // dans modules.js) — jamais inventée, toujours issue du corpus validé.
-      source: !estUrgent && module ? module.moduleOrigine : null,
-    };
+  const messageLulu = {
+    id: `l-${Date.now()}`,
+    auteur: 'lulu',
+    texte: regle ? regle.reponse : LULU_FALLBACK,
+    moduleSuggere: estUrgent ? null : module,
+    estUrgent,
+    source: !estUrgent && module ? module.moduleOrigine : null,
+  };
 
-    setMessages((prev) => [...prev, messageLulu]);
-    setEnAttente(false);
-    scrollVersLeBas();
-  }
+  setMessages((prev) => [...prev, messageLulu]);
+  scrollVersLeBas();
+  Speech.speak(messageLulu.texte, { language: 'fr-FR' });
+}
 
   return (
     <View style={styles.container}>
@@ -116,6 +144,14 @@ export default function LuluScreen({ navigation }) {
         />
 
         <View style={styles.inputRow}>
+          <Pressable
+            style={[styles.micButton, ecoute && styles.micButtonActive]}
+            onPress={basculerEcoute}
+            accessibilityRole="button"
+            accessibilityLabel={ecoute ? 'Arrêter l\'écoute' : 'Parler à Lulu'}
+          >
+            <MicIcon color={ecoute ? colors.dangerSoft ?? '#fff' : colors.accent} size={17} />
+          </Pressable>
           <TextInput
             style={styles.input}
             placeholder={t('lulu_placeholder')}
@@ -181,6 +217,11 @@ function getStyles(colors) {
       width: 42, height: 42, borderRadius: 21, backgroundColor: colors.accent,
       alignItems: 'center', justifyContent: 'center',
     },
+        micButton: {
+          width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center',
+          borderWidth: 1.5, borderColor: colors.accent,
+        },
+    micButtonActive: { backgroundColor: colors.danger, borderColor: colors.danger },
     sendButtonDisabled: { opacity: 0.5 },
     sendButtonText: { color: colors.accentText, fontSize: 18 },
   });

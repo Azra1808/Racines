@@ -75,6 +75,17 @@ const REPONSE_ALERTE_PROTECTION = {
     "Ce que vous décrivez est important, et vous n’êtes pas seul(e). Lulu ne peut pas vous accompagner sur cette situation, mais une personne le peut : parlez-en dès que possible à votre facilitateur communautaire, au centre de santé le plus proche ou à un service d’aide à l’enfance. Vous avez bien fait d’en parler.",
 };
 
+// Petites interactions de courtoisie — vérifiées après les garde-fous de
+// sécurité, mais avant la recherche de module. Aucun moduleId : Lulu répond
+// sans jamais essayer de rediriger vers un module dans ce cas.
+const LULU_SMALL_TALK = [
+  { keywords: ['bonjour', 'salut', 'bonsoir', 'coucou'], reponse: 'Bonjour ! Je suis Lulu 🌱 Posez-moi une question sur votre enfant, je vous orienterai vers le bon module.' },
+  { keywords: ['merci', 'super', 'parfait'], reponse: 'Avec plaisir ! N\'hésitez pas si vous avez d\'autres questions.' },
+  { keywords: ['au revoir', 'a plus', 'bonne journee', 'bonne soiree'], reponse: 'Au revoir, et bon courage dans votre rôle de parent ! 🌱' },
+  { keywords: ['ca va', 'comment vas tu', 'comment tu vas'], reponse: 'Je vais très bien, merci ! Je suis là pour vous aider avec vos questions sur votre enfant.' },
+  { keywords: ['qui es tu', 'c est quoi lulu', 'tu es qui'], reponse: 'Je suis Lulu, votre assistant RACINES 🌱 Je vous aide à trouver le bon module selon vos questions.' },
+];
+
 export const LULU_RULES = [
   {
     keywords: ['handicap', 'droit', 'discrimination'],
@@ -144,10 +155,17 @@ export function trouverReponse(texte) {
     return REPONSE_ALERTE_PROTECTION;
   }
 
-  for (const regle of LULU_RULES) {
-    if (regle.keywords.some((k) => texteNormalise.includes(normaliser(k)))) {
-      return regle;
+    for (const smallTalk of LULU_SMALL_TALK) {
+      if (smallTalk.keywords.some((k) => texteNormalise.includes(normaliser(k)))) {
+        return smallTalk;
+      }
     }
-  }
-  return null;
+
+    for (const regle of LULU_RULES) {
+      if (regle.keywords.some((k) => texteNormalise.includes(normaliser(k)))) {
+        return regle;
+      }
+    }
+    return null;
 }
+
